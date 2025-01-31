@@ -91,7 +91,8 @@
 <div class="pure-g" style="padding-top: 50px; height: 100%;">
     <div id="panel" class="pure-u-1 pure-u-md-1-5">
         <ul class="menu">
-            <li><a href="#techpack">Tech Pack</a></li>
+            <li><a href="#techPack">Tech Pack</a></li>
+            <li><a href="#BOMTable">Bill of Material</a></li>
         </ul>
 
         <button id="download-btn" class="pure-button">Download PDF</button>
@@ -118,6 +119,7 @@
 
 <!-- Some scripts to make the examples work nicely -->
 <script>
+    let imgsrc;
 
     window.onhashchange = function () {
         update();
@@ -126,9 +128,11 @@
     document.getElementById('download-btn').onclick = function () {
         update(true);
     };
+    async function update(shouldDownload) {
 
-    function update(shouldDownload) {
-        var funcStr = window.location.hash.replace(/#/g, '') || 'techpack';
+        imgsrc = await getDataUri('examples/techpng.png');
+
+        var funcStr = window.location.hash.replace(/#/g, '') || 'techPack';
         var doc = window.examples[funcStr]();
 
         doc.setProperties({
@@ -139,42 +143,12 @@
         if (shouldDownload) {
             doc.save('table.pdf');
         } else {
-            //document.getElementById("output").src = doc.output('datauristring');
             document.getElementById("output").data = doc.output('datauristring');
         }
     }
 
-    var base64Img, coinBase64Img;
-    imgToBase64('examples/document.jpg', function(base64) {
-        base64Img = base64;
-        imgToBase64('examples/coin.png', function(base64) {
-            coinBase64Img = base64;
-            update();
-        });
-    });
 
-    // You could either use a function similar to this or pre convert an image with for example http://dopiaza.org/tools/datauri
-    // https://stackoverflow.com/a/20285053/827047
-    function imgToBase64(src, callback) {
-        var outputFormat = src.substr(-3) === 'png' ? 'image/png' : 'image/jpeg';
-        var img = new Image();
-        img.crossOrigin = 'Anonymous';
-        img.onload = function() {
-            var canvas = document.createElement('CANVAS');
-            var ctx = canvas.getContext('2d');
-            var dataURL;
-            canvas.height = this.naturalHeight;
-            canvas.width = this.naturalWidth;
-            ctx.drawImage(this, 0, 0);
-            dataURL = canvas.toDataURL(outputFormat);
-            callback(dataURL);
-        };
-        img.src = src;
-        if (img.complete || img.complete === undefined) {
-            img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-            img.src = src;
-        }
-    }
+    update();
 </script>
 
 </body>
