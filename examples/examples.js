@@ -2,6 +2,115 @@ var examples = {}
 window.examples = examples
 var totalPagesExp = 'totalpagescountstringtobereplaced'
 
+
+const imageAreaWidth = 200; 
+const imageAreaHeight = 170;
+const cellPadding = 0;
+// const grids = [{
+//   id: 0,
+//   name: 'default',
+//   columns
+
+// }]
+
+function makeIllustrationPage(doc, settings = {}) {
+  doc.autoTable({
+    theme: 'plain',
+    body: [
+      ['', settings.text],
+    ],
+    columns: [
+      { header: ' ', dataKey: 'illustration' },
+      { header: ' ', dataKey: 'text' },
+    ],
+    columnStyles: { 
+      illustration: { cellPadding:cellPadding, cellWidth: imageAreaWidth, minCellHeight: imageAreaHeight},
+      text: {cellPadding:cellPadding } 
+
+    }, 
+    didDrawCell: async (data) => {
+      if (data.section === 'body' && data.column.dataKey === 'illustration') {
+        addIllustrationGrid(doc, data, settings)
+      }
+      if(data.section === 'body' && data.column.dataKey === 'text'){
+        cellBorderLeft(doc, data, 0)
+      }
+    },
+    willDrawPage: function (data) {
+      addPageHeader(doc, data)
+    },
+    didDrawPage: function () {
+      addPageNumber(doc)
+    },
+  })
+}
+
+
+function addIllustrationGrid(doc, data, gridSettings) {
+  // const body = [];
+  // gridData.forEach((row, rowindex) => {
+  //   const newRow = [];
+  //   row.forEach((cell, cellindex) => {
+  //     const width =  imageAreaWidth * (cell.w / 100);
+  //     const height = imageAreaHeight * (cell.h / 100);
+  //     newRow.push({
+  //         content: '',
+  //         styles: { cellWidth: width, minCellHeight: height, colSpan: colSpan[rowindex]  }
+  //     })
+  //   })
+  //   body.push(newRow)
+  // });
+
+
+  const columnStyles = {};
+  const body = [];
+  gridSettings.columns.forEach(col => {
+    columnStyles[col.dataKey] = { cellWidth: imageAreaWidth * (col.width / 100) };
+  });
+
+  let cellCount = 0;
+  gridSettings.rows.forEach(row => {
+    const rowData = [];
+    gridSettings.columns.forEach(col => {
+      const cell = gridSettings.cells[cellCount];
+      if(cell) {
+        const cellContent = { column: col.dataKey, content: '', colSpan: cell.span, rowSpan: 1, styles: { minCellHeight: imageAreaHeight * (row.height / 100)  } };
+        rowData.push(cellContent);
+        cellCount++;
+  
+      }
+    });
+    body.push(rowData);
+  });
+
+  doc.autoTable({
+    theme: 'plain',
+    startY: data.cell.y,
+    margin: { left: data.cell.x },
+    columns: gridSettings.columns.map(i => {return {dataKey: i.dataKey}}),
+    columnStyles: columnStyles,
+
+    body: body,
+    
+    didDrawCell: async (data) => {
+      if (data.section === 'body' && data.row.index === 0 && data.column.index === 0) {
+        // doc.addImage(imgsrc.base64, 'JPEG', data.cell.x , data.cell.y + 10, 0, 90);      
+      }
+      if(data.section === 'body' && data.row.index >= 1){
+        cellBorderTop(doc, data, 200)
+      }
+      if(data.section === 'body' && data.column.index === 0){
+        // cellBorderTop(doc, data, 200)
+      }
+      if(data.section === 'body' && data.column.index >= 1){
+        cellBorderLeft(doc, data, 200)
+      }
+    },
+  })
+
+
+}
+
 examples.techPack = function () {
   var doc = new jsPDF({
     orientation: 'l',
@@ -14,111 +123,53 @@ examples.techPack = function () {
   doc.setFontSize(7)
 
 
-  doc.autoTable({
-    theme: 'plain',
-    body: [
-      ['', '1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:'],
-    ],
-    columns: [
-      { header: ' ', dataKey: 'illustration' },
-      { header: ' ', dataKey: 'text' },
-    ],
-    columnStyles: { 
-      illustration: { cellPadding:5, minCellWidth: 120, minCellHeight: 170},
-      text: {cellPadding:5 } 
-
-    }, 
-    didDrawCell: async (data) => {
-      if (data.section === 'body' && data.row.index === 0 && data.column.index === 0) {
-        doc.addImage(imgsrc.base64, 'JPEG', data.cell.x , data.cell.y + 5 );      
-      }
-      if(data.section === 'body' && data.row.index === 0 && data.column.index === 1){
-        cellBorderLeft(doc, data, 0)
-      }
-    },
-    willDrawPage: function (data) {
-      addPageHeader(doc, data)
-    },
-    didDrawPage: function () {
-      addPageNumber(doc)
-    },
-  })
-
-  doc.addPage()
-
-  doc.autoTable({
-    theme: 'plain',
-
-    body:[
-      {
-        illustration: {
-          content: 'illu1',
-          colSpan: 0,
-          styles:{
-            minCellHeight: '110'
-          }
-        },
-        text: {
-          content: '1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
-          colSpan: 0,
-          styles:{
-            minCellHeight: '110'
-          }
-        },
-      },
-      {
-        illustration: {
-          content: 'illu2',
-          colSpan: 0,
-          styles:{
-            minCellHeight: '60'
-          }
-        },
-        text: {
-          content: '1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
-          colSpan: 0,
-          styles:{
-            minCellHeight: '60'
-          }
-        },
-      },
-    ],
-   
-    columns: [
-      { header: ' ', dataKey: 'illustration' },
-      { header: ' ', dataKey: 'text' },
-    ],
-    columnStyles: { 
-      illustration: { cellPadding:5, minCellWidth: 120},
-      text: {cellPadding:5 } 
-
-    }, 
-    didDrawCell: async (data) => {
-      if (data.section === 'body' && data.row.index === 0 && data.column.index === 0) {
-        doc.addImage(imgsrc.base64, 'JPEG', data.cell.x , data.cell.y + 10, 0, 90);      
-      }
-      if(data.section === 'body'  && data.column.index === 1){
-        cellBorderLeft(doc, data, 0)
-      }
-      if(data.section === 'body' && data.row.index === 1 && data.column.index === 0){
-        cellBorderTop(doc, data, 200, 5)
-        const xstart = data.cell.x
-        const ystart = data.cell.y + 10
-        const height = 60;
-
-        doc.addImage(imgsrc.base64, 'JPEG', xstart , ystart, 0 , height);      
-      }
-
-    },
-    willDrawPage: function (data) {
-      addPageHeader(doc, data)
-    },
-    didDrawPage: function () {
-      addPageNumber(doc)
-    },
-  })
+  makeIllustrationPage(doc, 
+    {
+      text:'1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
+      columns: [
+        { dataKey: 'col1', width: 33 },
+        { dataKey: 'col2', width: 33 },
+        { dataKey: 'col3', width: 33 },
+      ],
+      rows: [
+        { name: 'row1', height: 33},
+        { name: 'row2', height: 33},
+        { name: 'row3', height: 33}
+      ],
+      cells: [
+        {img:imgsrc, span: 1},
+        {img:imgsrc, span: 2},
+        {img:imgsrc, span: 1},
+        {img:imgsrc, span: 1},
+        {img:imgsrc, span: 1},
+        {img:imgsrc, span: 1},
+        {img:imgsrc, span: 1},
+        {img:imgsrc, span: 1},
+      ]
+    });
 
 
+  // makeIllustrationPage(doc, 
+  //   {
+  //     text:'1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
+  //     grid: [
+  //       [{w:100,h:70, img:imgsrc}], 
+  //       [{w:100,h:30, img:imgsrc}]
+  //     ],
+  //     colSpan: [1, 1]
+
+  //   });
+
+  //   makeIllustrationPage(doc, 
+  //     {
+  //       text:'1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
+  //       grid: [
+  //         [{w:10, h:50, img:imgsrc},{w:90, h:50, img:imgsrc}], 
+  //         [{w:100, h:50, img:imgsrc}]
+  //       ],
+  //       colSpan: [1, 2]
+  //     });
+  
 
 
 
@@ -182,12 +233,12 @@ examples.BOMTable = function () {
     },
     didDrawCell: (data) => {
       if ([5, 7, 11, 13].includes(data.column.index)) {
-        cellBorderLeft(doc, data, 0)
+        cellBorderLeft(doc, data)
       } else if (data.column.index > 0 && (data.section === 'body' || (data.section === 'head' && data.row.index === 2))) {
         cellBorderLeft(doc, data, 200)
       }
       if (data.section === 'head' && data.row.index === 2) {
-       cellBorderTop(doc, data, 0)
+       cellBorderTop(doc, data)
       }
       if (data.section === 'body') {
         cellBorderTop(doc, data, 200)
@@ -309,8 +360,7 @@ function headRows() {
   ]
 }
 
-function bodyRows(rowCount) {
-  rowCount = rowCount || 10
+function bodyRows(rowCount = 10) {
   var body = []
   for (var j = 1; j <= rowCount; j++) {
     body.push({
@@ -330,6 +380,8 @@ function bodyRows(rowCount) {
       grading: 'no',
     })
   }
+  body.splice(3, 0, {seperatorLabel: 'Fabrics'});
+  body.splice(12, 0, {seperatorLabel: 'Zippers'});
   return body
 }
 
@@ -380,12 +432,23 @@ function cellBorderLeft(doc, data, color = 200) {
   )
 }
 
-function cellBorderTop(doc,data, color=200, padding=0) {
+function cellBorderRight(doc, data, color = 200) {
+  doc.setDrawColor(color)
+  doc.line(
+    data.cell.x + data.cell.width,
+    data.cell.y,
+    data.cell.x + data.cell.width,
+    data.cell.y + data.cell.height,
+  )
+}
+
+
+function cellBorderTop(doc,data, color=200) {
   doc.setDrawColor(color)
   doc.line(
     data.cell.x,
     data.cell.y,
-    data.cell.x + data.cell.width - padding,
+    data.cell.x + data.cell.width,
     data.cell.y,
   )
 }
