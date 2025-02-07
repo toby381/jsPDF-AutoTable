@@ -119,7 +119,6 @@
 
 <!-- Some scripts to make the examples work nicely -->
 <script>
-    let imgsrc;
 
     window.onhashchange = function () {
         update();
@@ -130,10 +129,9 @@
     };
     async function update(shouldDownload) {
 
-        imgsrc = await getDataUri('examples/techpng.png');
 
         var funcStr = window.location.hash.replace(/#/g, '') || 'techPack';
-        var doc = window.examples[funcStr]();
+        var doc = await window.examples[funcStr]();
 
         doc.setProperties({
             title: 'Example: ' + funcStr,

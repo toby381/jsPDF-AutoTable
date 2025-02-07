@@ -5,7 +5,7 @@ var totalPagesExp = 'totalpagescountstringtobereplaced'
 
 const imageAreaWidth = 200; 
 const imageAreaHeight = 170;
-const cellPadding = 0;
+const cellPadding = 2;
 // const grids = [{
 //   id: 0,
 //   name: 'default',
@@ -76,21 +76,26 @@ function addIllustrationGrid(doc, data, gridSettings) {
     columnStyles: columnStyles,
     body: body,
     didParseCell: async (data) => {
-      if (data.section === 'body') {
+      if (data.section === 'body' && data.cell.raw && data.cell.raw.content) {
         const content = data.cell.raw.content.replace('[', '').replace(']', '');
         if(content) {
           const cellData = gridSettings.cells.find(c => c.id === content);
           if(cellData) {
-            console.log(cellData)
-            data.cell.base64 = cellData.img.base64;
+            data.cell.imgObj = cellData.img;
           }
         }
       }
 
     },
     didDrawCell: async (data) => {
-      if (data.section === 'body' && data.cell.base64) {
-        doc.addImage(data.cell.base64, 'JPEG', data.cell.x +2, data.cell.y+2, 0, data.cell.height-4);      
+      if (data.section === 'body' && data.cell.imgObj) {
+        const obj = data.cell.imgObj;
+        const str = obj.base64;
+        if(obj.width <= obj.height) {
+          doc.addImage(str, 'JPEG', data.cell.x +2, data.cell.y+2, 0, data.cell.height-4);      
+        } else {
+          doc.addImage(str, 'JPEG', data.cell.x +2, data.cell.y+2, data.cell.width-4, 0);      
+        }
       }
       if(data.section === 'body' && data.row.index >= 1){
         cellBorderTop(doc, data, 200)
@@ -107,13 +112,26 @@ function addIllustrationGrid(doc, data, gridSettings) {
 
 }
 
-examples.techPack = function () {
+examples.techPack = async function () {
+
   var doc = new jsPDF({
     orientation: 'l',
     unit: 'mm',
     format: 'a4',
     putOnlyUsedFonts: true,
   })
+  const img0 = await getDataUri('examples/img/techpng.png')
+  const img1 = await getDataUri('examples/img/Asset 1.png')
+  const img2 = await getDataUri('examples/img/Asset 2.png')
+  const img3 = await getDataUri('examples/img/Asset 3.png')
+  const img4 = await getDataUri('examples/img/Asset 4.png')
+  const img5 = await getDataUri('examples/img/Asset 5.png')
+  const img6 = await getDataUri('examples/img/Asset 6.png')
+  const img7 = await getDataUri('examples/img/Asset 7.png')
+  const img8 = await getDataUri('examples/img/Asset 8.png')
+  const img9 = await getDataUri('examples/img/Asset 9.png')
+  const img10 = await getDataUri('examples/img/Asset 10.png')
+  const img11 = await getDataUri('examples/img/Asset 11.png')
 
   addFontPack(doc);
   doc.setFontSize(7)
@@ -122,30 +140,85 @@ examples.techPack = function () {
   makeIllustrationPage(doc, 
     {
       text:'1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
-      columns: [
-        { dataKey: 'col1', width: 33 },
-        { dataKey: 'col2', width: 33 },
-        { dataKey: 'col3', width: 33 },
-      ],
-      rows: [
-        { name: 'row1', height: 33},
-        { name: 'row2', height: 33},
-        { name: 'row3', height: 33}
-      ],
-      cells: [
-        {img:imgsrc, span: 1, id: 'cell1'},
-        {img:imgsrc, span: 2, id: 'cell2'},
-        {img:imgsrc, span: 0, id: 'cell2'},
-        {img:imgsrc, span: 1, id: 'cell3'},
-        {img:imgsrc, span: 1, id: 'cell4'},
-        {img:imgsrc, span: 1, id: 'cell5'},
-        {img:imgsrc, span: 1, id: 'cell6'},
-        {img:imgsrc, span: 1, id: 'cell7'},
-        {img:imgsrc, span: 1, id: 'cell8'},
-      ]
+      columns: [{ dataKey: 'col1', width: 100 }],
+      rows: [{ name: 'row1', height: 100}],
+      cells: [{img:img0, span: 1, id: 'cell1'}]
     });
 
+
+    makeIllustrationPage(doc, 
+      {
+        text:'1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
+        columns: [{ dataKey: 'col1', width: 100 }],
+        rows: [
+          { name: 'row1', height: 60},
+          { name: 'row2', height: 40}
+        ],
+        cells: [
+          {img:img1, span: 1, id: 'cell1'},
+          {img:img2, span: 1, id: 'cell2'}
+        ]
+      });
+
+    makeIllustrationPage(doc, 
+      {
+        text:'1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
+        columns: [
+          { dataKey: 'col1', width: 50 },
+          { dataKey: 'col2', width: 50 }
+        ],
+        rows: [
+          { name: 'row1', height: 60},
+          { name: 'row2', height: 40}
+        ],
+        cells: [
+          {img:img3, span: 1, id: 'cell1'},
+          {img:img4, span: 1, id: 'cell2'},
+          {img:img5, span: 2, id: 'cell3'},
+          {span: 0, id: 'cell4'}
+        ]
+      });
+
+      makeIllustrationPage(doc, 
+        {
+          text:'1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
+          columns: [
+            { dataKey: 'col1', width: 50 },
+            { dataKey: 'col2', width: 50 }
+          ],
+          rows: [
+            { name: 'row1', height: 60},
+            { name: 'row2', height: 40}
+          ],
+          cells: [
+            {img:img6, span: 1, id: 'cell1'},
+            {img:img7, span: 1, id: 'cell2'},
+            {img:img8, span: 1, id: 'cell3'},
+            {img:img9, span: 1, id: 'cell4'},
+          ]
+        });
   
+
+        makeIllustrationPage(doc, 
+          {
+            text:'1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
+            columns: [
+              { dataKey: 'col1', width: 80 },
+              { dataKey: 'col2', width: 20 }
+            ],
+            rows: [
+              { name: 'row1', height: 100},
+            ],
+            cells: [
+              {img:img10, span: 1, id: 'cell1'},
+              {img:img11, span: 1, id: 'cell2'},
+            ]
+          });
+
+
+
+
+
 
   doc.setFont('dinsmallcapspdf')
   doc.putTotalPages(totalPagesExp)
