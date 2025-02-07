@@ -91,10 +91,12 @@ function addIllustrationGrid(doc, data, gridSettings) {
       if (data.section === 'body' && data.cell.imgObj) {
         const obj = data.cell.imgObj;
         const str = obj.base64;
-        if(obj.width <= obj.height) {
-          doc.addImage(str, 'JPEG', data.cell.x +2, data.cell.y+2, 0, data.cell.height-4);      
+        const cellProp = data.cell.width / data.cell.height;
+        const imgProp = obj.width / obj.height;
+        if(imgProp <= cellProp) {
+          doc.addImage(str, 'JPEG', data.cell.x+2, data.cell.y+2, 0, data.cell.height-4);      
         } else {
-          doc.addImage(str, 'JPEG', data.cell.x +2, data.cell.y+2, data.cell.width-4, 0);      
+          doc.addImage(str, 'JPEG', data.cell.x+2, data.cell.y+2, data.cell.width-4, 0);      
         }
       }
       if(data.section === 'body' && data.row.index >= 1){
@@ -272,9 +274,13 @@ examples.BOMTable = function () {
     head: headRows(),
     body: bodyRows(40),
     didParseCell: (data) => {
-     
       if (data.section === 'head' && data.row.index === 2) {
         data.cell.styles.font = 'dinsmallcapspdf'
+      }
+      if (data.section === 'body') {
+          if(data.cell.colSpan === 14) {
+            console.log(data)
+          }
       }
     },
     didDrawCell: (data) => {
@@ -426,8 +432,8 @@ function bodyRows(rowCount = 10) {
       grading: 'no',
     })
   }
-  body.splice(3, 0, {seperatorLabel: 'Fabrics'});
-  body.splice(12, 0, {seperatorLabel: 'Zippers'});
+  body.splice(3, 0, {image: { content: 'Fabrics', colSpan: 14, styles:{fillColor: 170 }}});
+  body.splice(15, 0, {image: { content: 'Zippers', colSpan: 14, styles:{fillColor: 170 } }});
   return body
 }
 
