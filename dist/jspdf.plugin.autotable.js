@@ -2,7 +2,7 @@
  * 
  *               jsPDF AutoTable plugin v3.8.4
  *
- *               Copyright (c) 2024 Simon Bengtsson, https://github.com/simonbengtsson/jsPDF-AutoTable
+ *               Copyright (c) 2025 Simon Bengtsson, https://github.com/simonbengtsson/jsPDF-AutoTable
  *               Licensed under the MIT License.
  *               http://opensource.org/licenses/mit-license
  *
@@ -16,12 +16,12 @@
 		var a = typeof exports === 'object' ? factory((function webpackLoadOptionalExternalModule() { try { return require("jspdf"); } catch(e) {} }())) : factory(root["jspdf"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(typeof globalThis !== 'undefined' ? globalThis : typeof this !== 'undefined' ? this : typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : global , function(__WEBPACK_EXTERNAL_MODULE__964__) {
+})(typeof globalThis !== 'undefined' ? globalThis : typeof this !== 'undefined' ? this : typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : global , function(__WEBPACK_EXTERNAL_MODULE__396__) {
 return /******/ (function() { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 172:
+/***/ 601:
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -71,17 +71,18 @@ exports.CellHookData = CellHookData;
 
 /***/ }),
 
-/***/ 340:
+/***/ 639:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var htmlParser_1 = __webpack_require__(4);
-var autoTableText_1 = __webpack_require__(136);
-var documentHandler_1 = __webpack_require__(744);
-var inputParser_1 = __webpack_require__(776);
-var tableDrawer_1 = __webpack_require__(664);
-var tableCalculator_1 = __webpack_require__(972);
+exports["default"] = default_1;
+var htmlParser_1 = __webpack_require__(660);
+var autoTableText_1 = __webpack_require__(150);
+var documentHandler_1 = __webpack_require__(643);
+var inputParser_1 = __webpack_require__(371);
+var tableDrawer_1 = __webpack_require__(789);
+var tableCalculator_1 = __webpack_require__(376);
 function default_1(jsPDF) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     jsPDF.API.autoTable = function () {
@@ -163,16 +164,16 @@ function default_1(jsPDF) {
         return this;
     };
 }
-exports["default"] = default_1;
 
 
 /***/ }),
 
-/***/ 136:
+/***/ 150:
 /***/ (function(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports["default"] = default_1;
 /**
  * Improved text function with halign and valign support
  * Inspiration from: http://stackoverflow.com/questions/28327510/align-text-right-using-jspdf/28433113#28433113
@@ -226,17 +227,20 @@ function default_1(text, x, y, styles, doc) {
     }
     return doc;
 }
-exports["default"] = default_1;
 
 
 /***/ }),
 
-/***/ 420:
+/***/ 799:
 /***/ (function(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getPageAvailableWidth = exports.parseSpacing = exports.getFillStyle = exports.addTableBorder = exports.getStringWidth = void 0;
+exports.getStringWidth = getStringWidth;
+exports.addTableBorder = addTableBorder;
+exports.getFillStyle = getFillStyle;
+exports.parseSpacing = parseSpacing;
+exports.getPageAvailableWidth = getPageAvailableWidth;
 function getStringWidth(text, styles, doc) {
     doc.applyStyles(styles, true);
     var textArr = Array.isArray(text) ? text : [text];
@@ -245,7 +249,6 @@ function getStringWidth(text, styles, doc) {
         .reduce(function (a, b) { return Math.max(a, b); }, 0);
     return widestLineWidth;
 }
-exports.getStringWidth = getStringWidth;
 function addTableBorder(doc, table, startPos, cursor) {
     var lineWidth = table.settings.tableLineWidth;
     var lineColor = table.settings.tableLineColor;
@@ -255,7 +258,6 @@ function addTableBorder(doc, table, startPos, cursor) {
         doc.rect(startPos.x, startPos.y, table.getWidth(doc.pageSize().width), cursor.y - startPos.y, fillStyle);
     }
 }
-exports.addTableBorder = addTableBorder;
 function getFillStyle(lineWidth, fillColor) {
     var drawLine = lineWidth > 0;
     var drawBackground = fillColor || fillColor === 0;
@@ -272,7 +274,6 @@ function getFillStyle(lineWidth, fillColor) {
         return null;
     }
 }
-exports.getFillStyle = getFillStyle;
 function parseSpacing(value, defaultValue) {
     var _a, _b, _c, _d;
     value = value || defaultValue;
@@ -329,17 +330,15 @@ function parseSpacing(value, defaultValue) {
     }
     return { top: value, right: value, bottom: value, left: value };
 }
-exports.parseSpacing = parseSpacing;
 function getPageAvailableWidth(doc, table) {
     var margins = parseSpacing(table.settings.margin, 0);
     return doc.pageSize().width - (margins.left + margins.right);
 }
-exports.getPageAvailableWidth = getPageAvailableWidth;
 
 
 /***/ }),
 
-/***/ 796:
+/***/ 28:
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -359,7 +358,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getTheme = exports.defaultStyles = exports.HtmlRowInput = void 0;
+exports.HtmlRowInput = void 0;
+exports.defaultStyles = defaultStyles;
+exports.getTheme = getTheme;
 var HtmlRowInput = /** @class */ (function (_super) {
     __extends(HtmlRowInput, _super);
     function HtmlRowInput(element) {
@@ -389,7 +390,6 @@ function defaultStyles(scaleFactor) {
         minCellWidth: 0,
     };
 }
-exports.defaultStyles = defaultStyles;
 function getTheme(name) {
     var themes = {
         striped: {
@@ -428,21 +428,20 @@ function getTheme(name) {
     };
     return themes[name];
 }
-exports.getTheme = getTheme;
 
 
 /***/ }),
 
-/***/ 903:
+/***/ 460:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseCss = void 0;
+exports.parseCss = parseCss;
 // Limitations
 // - No support for border spacing
 // - No support for transparency
-var common_1 = __webpack_require__(420);
+var common_1 = __webpack_require__(799);
 function parseCss(supportedFonts, element, scaleFactor, style, window) {
     var result = {};
     var pxScaleFactor = 96 / 72;
@@ -515,7 +514,6 @@ function parseCss(supportedFonts, element, scaleFactor, style, window) {
     }
     return result;
 }
-exports.parseCss = parseCss;
 function parseFontStyle(style) {
     var res = '';
     if (style.fontWeight === 'bold' ||
@@ -587,7 +585,7 @@ function parsePadding(style, scaleFactor) {
 
 /***/ }),
 
-/***/ 744:
+/***/ 643:
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -758,14 +756,14 @@ exports.DocHandler = DocHandler;
 
 /***/ }),
 
-/***/ 4:
+/***/ 660:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseHtml = void 0;
-var cssParser_1 = __webpack_require__(903);
-var config_1 = __webpack_require__(796);
+exports.parseHtml = parseHtml;
+var cssParser_1 = __webpack_require__(460);
+var config_1 = __webpack_require__(28);
 function parseHtml(doc, input, window, includeHiddenHtml, useCss) {
     var _a, _b;
     if (includeHiddenHtml === void 0) { includeHiddenHtml = false; }
@@ -803,7 +801,6 @@ function parseHtml(doc, input, window, includeHiddenHtml, useCss) {
     }
     return { head: head, body: body, foot: foot };
 }
-exports.parseHtml = parseHtml;
 function parseRowContent(supportedFonts, scaleFactor, window, row, includeHidden, useCss) {
     var resultRow = new config_1.HtmlRowInput(row);
     for (var i = 0; i < row.cells.length; i++) {
@@ -846,17 +843,17 @@ function parseCellContent(orgCell) {
 
 /***/ }),
 
-/***/ 776:
+/***/ 371:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseInput = void 0;
-var htmlParser_1 = __webpack_require__(4);
-var polyfills_1 = __webpack_require__(356);
-var common_1 = __webpack_require__(420);
-var documentHandler_1 = __webpack_require__(744);
-var inputValidator_1 = __webpack_require__(792);
+exports.parseInput = parseInput;
+var htmlParser_1 = __webpack_require__(660);
+var polyfills_1 = __webpack_require__(176);
+var common_1 = __webpack_require__(799);
+var documentHandler_1 = __webpack_require__(643);
+var inputValidator_1 = __webpack_require__(344);
 function parseInput(d, current) {
     var doc = new documentHandler_1.DocHandler(d);
     var document = doc.getDocumentOptions();
@@ -879,7 +876,6 @@ function parseInput(d, current) {
         settings: settings,
     };
 }
-exports.parseInput = parseInput;
 function parseStyles(gInput, dInput, cInput) {
     var styleOptions = {
         styles: {},
@@ -1058,11 +1054,12 @@ function parseColumns(head, body, foot) {
 
 /***/ }),
 
-/***/ 792:
+/***/ 344:
 /***/ (function(__unused_webpack_module, exports) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports["default"] = default_1;
 function default_1(doc, global, document, current) {
     var _loop_1 = function (options) {
         if (options && typeof options !== 'object') {
@@ -1164,7 +1161,6 @@ function default_1(doc, global, document, current) {
         _loop_1(options);
     }
 }
-exports["default"] = default_1;
 function checkStyles(styles) {
     if (styles.rowHeight) {
         console.error('Use of deprecated style rowHeight. It is renamed to minCellHeight.');
@@ -1183,15 +1179,15 @@ function checkStyles(styles) {
 
 /***/ }),
 
-/***/ 260:
+/***/ 524:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Column = exports.Cell = exports.Row = exports.Table = void 0;
-var config_1 = __webpack_require__(796);
-var HookData_1 = __webpack_require__(172);
-var common_1 = __webpack_require__(420);
+var config_1 = __webpack_require__(28);
+var HookData_1 = __webpack_require__(601);
+var common_1 = __webpack_require__(799);
 var Table = /** @class */ (function () {
     function Table(input, content) {
         this.pageNumber = 1;
@@ -1413,13 +1409,13 @@ exports.Column = Column;
 
 /***/ }),
 
-/***/ 356:
+/***/ 176:
 /***/ (function(__unused_webpack_module, exports) {
 
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.assign = void 0;
+exports.assign = assign;
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 function assign(target, s, s1, s2, s3) {
     if (target == null) {
@@ -1441,22 +1437,21 @@ function assign(target, s, s1, s2, s3) {
     }
     return to;
 }
-exports.assign = assign;
 
 
 /***/ }),
 
-/***/ 972:
+/***/ 376:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createTable = void 0;
-var documentHandler_1 = __webpack_require__(744);
-var models_1 = __webpack_require__(260);
-var widthCalculator_1 = __webpack_require__(324);
-var config_1 = __webpack_require__(796);
-var polyfills_1 = __webpack_require__(356);
+exports.createTable = createTable;
+var documentHandler_1 = __webpack_require__(643);
+var models_1 = __webpack_require__(524);
+var widthCalculator_1 = __webpack_require__(152);
+var config_1 = __webpack_require__(28);
+var polyfills_1 = __webpack_require__(176);
 function createTable(jsPDFDoc, input) {
     var doc = new documentHandler_1.DocHandler(jsPDFDoc);
     var content = parseContent(input, doc.scaleFactor());
@@ -1465,7 +1460,6 @@ function createTable(jsPDFDoc, input) {
     doc.applyStyles(doc.userStyles);
     return table;
 }
-exports.createTable = createTable;
 function parseContent(input, sf) {
     var content = input.content;
     var columns = createColumns(content.columns);
@@ -1606,18 +1600,19 @@ function cellStyles(sectionName, column, rowIndex, themeName, styles, scaleFacto
 
 /***/ }),
 
-/***/ 664:
+/***/ 789:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.addPage = exports.drawTable = void 0;
-var common_1 = __webpack_require__(420);
-var models_1 = __webpack_require__(260);
-var documentHandler_1 = __webpack_require__(744);
-var polyfills_1 = __webpack_require__(356);
-var autoTableText_1 = __webpack_require__(136);
-var tablePrinter_1 = __webpack_require__(224);
+exports.drawTable = drawTable;
+exports.addPage = addPage;
+var common_1 = __webpack_require__(799);
+var models_1 = __webpack_require__(524);
+var documentHandler_1 = __webpack_require__(643);
+var polyfills_1 = __webpack_require__(176);
+var autoTableText_1 = __webpack_require__(150);
+var tablePrinter_1 = __webpack_require__(626);
 function drawTable(jsPDFDoc, table) {
     var settings = table.settings;
     var startY = settings.startY;
@@ -1676,7 +1671,6 @@ function drawTable(jsPDFDoc, table) {
         jsPDFDoc.autoTable.previous = table; // Deprecated
     doc.applyStyles(doc.userStyles);
 }
-exports.drawTable = drawTable;
 function printTableWithHorizontalPageBreak(doc, table, startPos, cursor) {
     // calculate width of columns and render only those which can fit into page
     var allColumnsCanFitResult = (0, tablePrinter_1.calculateAllColumnsCanFitInPage)(doc, table);
@@ -2038,7 +2032,6 @@ function addPage(doc, table, startPos, cursor, columns, suppressFooter) {
         doc.applyStyles(doc.userStyles);
     }
 }
-exports.addPage = addPage;
 function nextPage(doc) {
     var current = doc.pageNumber();
     doc.setPage(current + 1);
@@ -2053,13 +2046,13 @@ function nextPage(doc) {
 
 /***/ }),
 
-/***/ 224:
+/***/ 626:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.calculateAllColumnsCanFitInPage = void 0;
-var common_1 = __webpack_require__(420);
+exports.calculateAllColumnsCanFitInPage = calculateAllColumnsCanFitInPage;
+var common_1 = __webpack_require__(799);
 // get columns can be fit into page
 function getColumnsCanFitInPage(doc, table, config) {
     var _a;
@@ -2124,18 +2117,19 @@ function calculateAllColumnsCanFitInPage(doc, table) {
     }
     return allResults;
 }
-exports.calculateAllColumnsCanFitInPage = calculateAllColumnsCanFitInPage;
 
 
 /***/ }),
 
-/***/ 324:
+/***/ 152:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ellipsize = exports.resizeColumns = exports.calculateWidths = void 0;
-var common_1 = __webpack_require__(420);
+exports.calculateWidths = calculateWidths;
+exports.resizeColumns = resizeColumns;
+exports.ellipsize = ellipsize;
+var common_1 = __webpack_require__(799);
 /**
  * Calculate the column widths
  */
@@ -2182,7 +2176,6 @@ function calculateWidths(doc, table) {
     fitContent(table, doc);
     applyRowSpans(table);
 }
-exports.calculateWidths = calculateWidths;
 function calculate(doc, table) {
     var sf = doc.scaleFactor();
     var horizontalPageBreak = table.settings.horizontalPageBreak;
@@ -2300,7 +2293,6 @@ function resizeColumns(columns, resizeWidth, getMinWidth) {
     }
     return resizeWidth;
 }
-exports.resizeColumns = resizeColumns;
 function applyRowSpans(table) {
     var rowSpanCells = {};
     var colRowSpansLeft = 1;
@@ -2427,7 +2419,6 @@ function fitContent(table, doc) {
 function ellipsize(text, width, styles, doc, overflow) {
     return text.map(function (str) { return ellipsizeStr(str, width, styles, doc, overflow); });
 }
-exports.ellipsize = ellipsize;
 function ellipsizeStr(text, width, styles, doc, overflow) {
     var precision = 10000 * doc.scaleFactor();
     width = Math.ceil(width * precision) / precision;
@@ -2446,12 +2437,12 @@ function ellipsizeStr(text, width, styles, doc, overflow) {
 
 /***/ }),
 
-/***/ 964:
+/***/ 396:
 /***/ (function(module) {
 
-if(typeof __WEBPACK_EXTERNAL_MODULE__964__ === 'undefined') { var e = new Error("Cannot find module 'undefined'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
+if(typeof __WEBPACK_EXTERNAL_MODULE__396__ === 'undefined') { var e = new Error("Cannot find module 'undefined'"); e.code = 'MODULE_NOT_FOUND'; throw e; }
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__964__;
+module.exports = __WEBPACK_EXTERNAL_MODULE__396__;
 
 /***/ })
 
@@ -2483,21 +2474,24 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__964__;
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry needs to be wrapped in an IIFE because it uses a non-standard name for the exports (exports).
 !function() {
 var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Cell = exports.Column = exports.Row = exports.Table = exports.CellHookData = exports.__drawTable = exports.__createTable = exports.applyPlugin = void 0;
-var applyPlugin_1 = __webpack_require__(340);
-var inputParser_1 = __webpack_require__(776);
-var tableDrawer_1 = __webpack_require__(664);
-var tableCalculator_1 = __webpack_require__(972);
-var models_1 = __webpack_require__(260);
+exports.Cell = exports.Column = exports.Row = exports.Table = exports.CellHookData = void 0;
+exports.applyPlugin = applyPlugin;
+exports.__createTable = __createTable;
+exports.__drawTable = __drawTable;
+var applyPlugin_1 = __webpack_require__(639);
+var inputParser_1 = __webpack_require__(371);
+var tableDrawer_1 = __webpack_require__(789);
+var tableCalculator_1 = __webpack_require__(376);
+var models_1 = __webpack_require__(524);
 Object.defineProperty(exports, "Table", ({ enumerable: true, get: function () { return models_1.Table; } }));
-var HookData_1 = __webpack_require__(172);
+var HookData_1 = __webpack_require__(601);
 Object.defineProperty(exports, "CellHookData", ({ enumerable: true, get: function () { return HookData_1.CellHookData; } }));
-var models_2 = __webpack_require__(260);
+var models_2 = __webpack_require__(524);
 Object.defineProperty(exports, "Cell", ({ enumerable: true, get: function () { return models_2.Cell; } }));
 Object.defineProperty(exports, "Column", ({ enumerable: true, get: function () { return models_2.Column; } }));
 Object.defineProperty(exports, "Row", ({ enumerable: true, get: function () { return models_2.Row; } }));
@@ -2506,7 +2500,6 @@ Object.defineProperty(exports, "Row", ({ enumerable: true, get: function () { re
 function applyPlugin(jsPDF) {
     (0, applyPlugin_1.default)(jsPDF);
 }
-exports.applyPlugin = applyPlugin;
 function autoTable(d, options) {
     var input = (0, inputParser_1.parseInput)(d, options);
     var table = (0, tableCalculator_1.createTable)(d, input);
@@ -2517,14 +2510,12 @@ function __createTable(d, options) {
     var input = (0, inputParser_1.parseInput)(d, options);
     return (0, tableCalculator_1.createTable)(d, input);
 }
-exports.__createTable = __createTable;
 function __drawTable(d, table) {
     (0, tableDrawer_1.drawTable)(d, table);
 }
-exports.__drawTable = __drawTable;
 try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    var jsPDF = __webpack_require__(964);
+    var jsPDF = __webpack_require__(396);
     // Webpack imported jspdf instead of jsPDF for some reason
     // while it seemed to work everywhere else.
     if (jsPDF.jsPDF)

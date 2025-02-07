@@ -76,10 +76,10 @@ function parseSpacing(value, defaultValue) {
             value.left = value.horizontal;
         }
         return {
-            left: (_a = value.left) !== null && _a !== void 0 ? _a : defaultValue,
-            top: (_b = value.top) !== null && _b !== void 0 ? _b : defaultValue,
-            right: (_c = value.right) !== null && _c !== void 0 ? _c : defaultValue,
-            bottom: (_d = value.bottom) !== null && _d !== void 0 ? _d : defaultValue,
+            left: (_a = value.left) !== null && _a !== undefined ? _a : defaultValue,
+            top: (_b = value.top) !== null && _b !== undefined ? _b : defaultValue,
+            right: (_c = value.right) !== null && _c !== undefined ? _c : defaultValue,
+            bottom: (_d = value.bottom) !== null && _d !== undefined ? _d : defaultValue,
         };
     }
     if (typeof value !== 'number') {
@@ -249,7 +249,7 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
-/* global Reflect, Promise, SuppressedError, Symbol */
+/* global Reflect, Promise, SuppressedError, Symbol, Iterator */
 
 var extendStatics = function(d, b) {
     extendStatics = Object.setPrototypeOf ||
@@ -340,8 +340,8 @@ function getTheme(name) {
 
 function parseHtml(doc, input, window, includeHiddenHtml, useCss) {
     var _a, _b;
-    if (includeHiddenHtml === void 0) { includeHiddenHtml = false; }
-    if (useCss === void 0) { useCss = false; }
+    if (includeHiddenHtml === undefined) { includeHiddenHtml = false; }
+    if (useCss === undefined) { useCss = false; }
     var tableElement;
     if (typeof input === 'string') {
         tableElement = window.document.querySelector(input);
@@ -358,7 +358,7 @@ function parseHtml(doc, input, window, includeHiddenHtml, useCss) {
     }
     for (var i = 0; i < tableElement.rows.length; i++) {
         var element = tableElement.rows[i];
-        var tagName = (_b = (_a = element === null || element === void 0 ? void 0 : element.parentElement) === null || _a === void 0 ? void 0 : _a.tagName) === null || _b === void 0 ? void 0 : _b.toLowerCase();
+        var tagName = (_b = (_a = element === null || element === undefined ? undefined : element.parentElement) === null || _a === undefined ? undefined : _a.tagName) === null || _b === undefined ? undefined : _b.toLowerCase();
         var row = parseRowContent(supportedFonts, scaleFactor, window, element, includeHiddenHtml, useCss);
         if (!row)
             continue;
@@ -381,7 +381,7 @@ function parseRowContent(supportedFonts, scaleFactor, window, row, includeHidden
         var cell = row.cells[i];
         var style_1 = window.getComputedStyle(cell);
         if (includeHidden || style_1.display !== 'none') {
-            var cellStyles = void 0;
+            var cellStyles = undefined;
             if (useCss) {
                 cellStyles = parseCss(supportedFonts, cell, scaleFactor, style_1, window);
             }
@@ -491,7 +491,7 @@ var DocHandler = /** @class */ (function () {
         };
     }
     DocHandler.setDefaults = function (defaults, doc) {
-        if (doc === void 0) { doc = null; }
+        if (doc === undefined) { doc = null; }
         if (doc) {
             doc.__autoTableDocumentDefaults = defaults;
         }
@@ -517,7 +517,7 @@ var DocHandler = /** @class */ (function () {
         // Font style needs to be applied before font
         // https://github.com/simonbengtsson/jsPDF-AutoTable/issues/632
         var _a, _b, _c;
-        if (fontOnly === void 0) { fontOnly = false; }
+        if (fontOnly === undefined) { fontOnly = false; }
         if (styles.fontStyle)
             this.jsPDFDocument.setFontStyle &&
                 this.jsPDFDocument.setFontStyle(styles.fontStyle);
@@ -843,7 +843,7 @@ function parseHooks(global, document, current) {
 function parseSettings(doc, options) {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
     var margin = parseSpacing(options.margin, 40 / doc.scaleFactor());
-    var startY = (_a = getStartY(doc, options.startY)) !== null && _a !== void 0 ? _a : margin.top;
+    var startY = (_a = getStartY(doc, options.startY)) !== null && _a !== undefined ? _a : margin.top;
     var showFoot;
     if (options.showFoot === true) {
         showFoot = 'everyPage';
@@ -852,7 +852,7 @@ function parseSettings(doc, options) {
         showFoot = 'never';
     }
     else {
-        showFoot = (_b = options.showFoot) !== null && _b !== void 0 ? _b : 'everyPage';
+        showFoot = (_b = options.showFoot) !== null && _b !== undefined ? _b : 'everyPage';
     }
     var showHead;
     if (options.showHead === true) {
@@ -862,28 +862,28 @@ function parseSettings(doc, options) {
         showHead = 'never';
     }
     else {
-        showHead = (_c = options.showHead) !== null && _c !== void 0 ? _c : 'everyPage';
+        showHead = (_c = options.showHead) !== null && _c !== undefined ? _c : 'everyPage';
     }
-    var useCss = (_d = options.useCss) !== null && _d !== void 0 ? _d : false;
+    var useCss = (_d = options.useCss) !== null && _d !== undefined ? _d : false;
     var theme = options.theme || (useCss ? 'plain' : 'striped');
     var horizontalPageBreak = !!options.horizontalPageBreak;
-    var horizontalPageBreakRepeat = (_e = options.horizontalPageBreakRepeat) !== null && _e !== void 0 ? _e : null;
+    var horizontalPageBreakRepeat = (_e = options.horizontalPageBreakRepeat) !== null && _e !== undefined ? _e : null;
     return {
-        includeHiddenHtml: (_f = options.includeHiddenHtml) !== null && _f !== void 0 ? _f : false,
+        includeHiddenHtml: (_f = options.includeHiddenHtml) !== null && _f !== undefined ? _f : false,
         useCss: useCss,
         theme: theme,
         startY: startY,
         margin: margin,
-        pageBreak: (_g = options.pageBreak) !== null && _g !== void 0 ? _g : 'auto',
-        rowPageBreak: (_h = options.rowPageBreak) !== null && _h !== void 0 ? _h : 'auto',
-        tableWidth: (_j = options.tableWidth) !== null && _j !== void 0 ? _j : 'auto',
+        pageBreak: (_g = options.pageBreak) !== null && _g !== undefined ? _g : 'auto',
+        rowPageBreak: (_h = options.rowPageBreak) !== null && _h !== undefined ? _h : 'auto',
+        tableWidth: (_j = options.tableWidth) !== null && _j !== undefined ? _j : 'auto',
         showHead: showHead,
         showFoot: showFoot,
-        tableLineWidth: (_k = options.tableLineWidth) !== null && _k !== void 0 ? _k : 0,
-        tableLineColor: (_l = options.tableLineColor) !== null && _l !== void 0 ? _l : 200,
+        tableLineWidth: (_k = options.tableLineWidth) !== null && _k !== undefined ? _k : 0,
+        tableLineColor: (_l = options.tableLineColor) !== null && _l !== undefined ? _l : 200,
         horizontalPageBreak: horizontalPageBreak,
         horizontalPageBreakRepeat: horizontalPageBreakRepeat,
-        horizontalPageBreakBehaviour: (_m = options.horizontalPageBreakBehaviour) !== null && _m !== void 0 ? _m : 'afterAllRows',
+        horizontalPageBreakBehaviour: (_m = options.horizontalPageBreakBehaviour) !== null && _m !== undefined ? _m : 'afterAllRows',
     };
 }
 function getStartY(doc, userStartY) {
@@ -899,7 +899,7 @@ function getStartY(doc, userStartY) {
         return userStartY;
     }
     else if (userStartY == null || userStartY === false) {
-        if (isSamePageAsPreviousTable && (previous === null || previous === void 0 ? void 0 : previous.finalY) != null) {
+        if (isSamePageAsPreviousTable && (previous === null || previous === undefined ? undefined : previous.finalY) != null) {
             // Some users had issues with overlapping tables when they used multiple
             // tables without setting startY so setting it here to a sensible default.
             return previous.finalY + 20 / sf;
@@ -946,10 +946,10 @@ function parseColumns(head, body, foot) {
             input = firstRow[key];
         }
         if (typeof input === 'object' && !Array.isArray(input)) {
-            colSpan = (input === null || input === void 0 ? void 0 : input.colSpan) || 1;
+            colSpan = (input === null || input === undefined ? undefined : input.colSpan) || 1;
         }
         for (var i = 0; i < colSpan; i++) {
-            var id = void 0;
+            var id = undefined;
             if (Array.isArray(firstRow)) {
                 id = result.length;
             }
@@ -1055,7 +1055,7 @@ var Table = /** @class */ (function () {
 }());
 var Row = /** @class */ (function () {
     function Row(raw, index, section, cells, spansMultiplePages) {
-        if (spansMultiplePages === void 0) { spansMultiplePages = false; }
+        if (spansMultiplePages === undefined) { spansMultiplePages = false; }
         this.height = 0;
         this.raw = raw;
         if (raw instanceof HtmlRowInput) {
@@ -1069,7 +1069,7 @@ var Row = /** @class */ (function () {
     }
     Row.prototype.getMaxCellHeight = function (columns) {
         var _this = this;
-        return columns.reduce(function (acc, column) { var _a; return Math.max(acc, ((_a = _this.cells[column.index]) === null || _a === void 0 ? void 0 : _a.height) || 0); }, 0);
+        return columns.reduce(function (acc, column) { var _a; return Math.max(acc, ((_a = _this.cells[column.index]) === null || _a === undefined ? undefined : _a.height) || 0); }, 0);
     };
     Row.prototype.hasRowSpan = function (columns) {
         var _this = this;
@@ -1116,7 +1116,7 @@ var Cell = /** @class */ (function () {
         if (raw != null && typeof raw === 'object' && !Array.isArray(raw)) {
             this.rowSpan = raw.rowSpan || 1;
             this.colSpan = raw.colSpan || 1;
-            content = (_b = (_a = raw.content) !== null && _a !== void 0 ? _a : raw.title) !== null && _b !== void 0 ? _b : raw;
+            content = (_b = (_a = raw.content) !== null && _a !== undefined ? _a : raw.title) !== null && _b !== undefined ? _b : raw;
             if (raw._element) {
                 this.raw = raw._element;
             }
@@ -1157,7 +1157,7 @@ var Cell = /** @class */ (function () {
     };
     // TODO (v4): replace parameters with only (lineHeight)
     Cell.prototype.getContentHeight = function (scaleFactor, lineHeightFactor) {
-        if (lineHeightFactor === void 0) { lineHeightFactor = 1.15; }
+        if (lineHeightFactor === undefined) { lineHeightFactor = 1.15; }
         var lineCount = Array.isArray(this.text) ? this.text.length : 1;
         var lineHeight = (this.styles.fontSize / scaleFactor) * lineHeightFactor;
         var height = lineCount * lineHeight + this.padding('vertical');
@@ -1204,7 +1204,7 @@ var Column = /** @class */ (function () {
 // get columns can be fit into page
 function getColumnsCanFitInPage(doc, table, config) {
     var _a;
-    if (config === void 0) { config = {}; }
+    if (config === undefined) { config = {}; }
     // Get page width
     var remainingWidth = getPageAvailableWidth(doc, table);
     // Get column data key to repeat
@@ -1232,7 +1232,7 @@ function getColumnsCanFitInPage(doc, table, config) {
         }
     });
     var first = true;
-    var i = (_a = config === null || config === void 0 ? void 0 : config.start) !== null && _a !== void 0 ? _a : 0; // make sure couter is initiated outside the loop
+    var i = (_a = config === null || config === undefined ? undefined : config.start) !== null && _a !== undefined ? _a : 0; // make sure couter is initiated outside the loop
     while (i < table.columns.length) {
         // Prevent duplicates
         if (repeatColumnsMap.has(i)) {
@@ -1400,7 +1400,7 @@ function printBody(doc, table, startPos, cursor, columns) {
 }
 function printBodyWithoutPageBreaks(doc, table, startRowIndex, cursor, columns, maxNumberOfRows) {
     doc.applyStyles(doc.userStyles);
-    maxNumberOfRows = maxNumberOfRows !== null && maxNumberOfRows !== void 0 ? maxNumberOfRows : table.body.length;
+    maxNumberOfRows = maxNumberOfRows !== null && maxNumberOfRows !== undefined ? maxNumberOfRows : table.body.length;
     var endRowIndex = Math.min(startRowIndex + maxNumberOfRows, table.body.length);
     var lastPrintedRowIndex = -1;
     table.body.slice(startRowIndex, endRowIndex).forEach(function (row, index) {
@@ -1661,8 +1661,8 @@ function getRemainingPageSpace(doc, table, isLastRow, cursor) {
     return doc.pageSize().height - cursor.y - bottomContentHeight;
 }
 function addPage(doc, table, startPos, cursor, columns, suppressFooter) {
-    if (columns === void 0) { columns = []; }
-    if (suppressFooter === void 0) { suppressFooter = false; }
+    if (columns === undefined) { columns = []; }
+    if (suppressFooter === undefined) { suppressFooter = false; }
     doc.applyStyles(doc.userStyles);
     if (table.settings.showFoot === 'everyPage' && !suppressFooter) {
         table.foot.forEach(function (row) { return printRow(doc, table, row, cursor, columns); });
@@ -2043,7 +2043,7 @@ function parseSection(sectionName, sectionRows, columns, styleProps, theme, scal
             if (rowSpansLeftForColumn[column.index] == null ||
                 rowSpansLeftForColumn[column.index].left === 0) {
                 if (columnSpansLeft === 0) {
-                    var rawCell = void 0;
+                    var rawCell = undefined;
                     if (Array.isArray(rawRow)) {
                         rawCell =
                             rawRow[column.index - colSpansAdded - skippedRowForRowSpans];
@@ -2053,7 +2053,7 @@ function parseSection(sectionName, sectionRows, columns, styleProps, theme, scal
                     }
                     var cellInputStyles = {};
                     if (typeof rawCell === 'object' && !Array.isArray(rawCell)) {
-                        cellInputStyles = (rawCell === null || rawCell === void 0 ? void 0 : rawCell.styles) || {};
+                        cellInputStyles = (rawCell === null || rawCell === undefined ? undefined : rawCell.styles) || {};
                     }
                     var styles = cellStyles(sectionName, column, rowIndex, theme, styleProps, scaleFactor, cellInputStyles);
                     var cell = new Cell(rawCell, styles, sectionName);
@@ -2112,7 +2112,7 @@ function createColumns(columns) {
         var _a, _b;
         var key;
         if (typeof input === 'object') {
-            key = (_b = (_a = input.dataKey) !== null && _a !== void 0 ? _a : input.key) !== null && _b !== void 0 ? _b : index;
+            key = (_b = (_a = input.dataKey) !== null && _a !== undefined ? _a : input.key) !== null && _b !== undefined ? _b : index;
         }
         else {
             key = index;
@@ -2183,14 +2183,14 @@ function _applyPlugin (jsPDF) {
     };
     jsPDF.API.autoTableHtmlToJson = function (tableElem, includeHiddenElements) {
         var _a;
-        if (includeHiddenElements === void 0) { includeHiddenElements = false; }
+        if (includeHiddenElements === undefined) { includeHiddenElements = false; }
         if (typeof window === 'undefined') {
             console.error('Cannot run autoTableHtmlToJson in non browser environment');
             return null;
         }
         var doc = new DocHandler(this);
         var _b = parseHtml(doc, tableElem, window, includeHiddenElements, false), head = _b.head, body = _b.body;
-        var columns = ((_a = head[0]) === null || _a === void 0 ? void 0 : _a.map(function (c) { return c.content; })) || [];
+        var columns = ((_a = head[0]) === null || _a === undefined ? undefined : _a.map(function (c) { return c.content; })) || [];
         return { columns: columns, rows: body, data: body };
     };
     /**

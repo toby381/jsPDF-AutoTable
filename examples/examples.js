@@ -47,21 +47,6 @@ function makeIllustrationPage(doc, settings = {}) {
 
 
 function addIllustrationGrid(doc, data, gridSettings) {
-  // const body = [];
-  // gridData.forEach((row, rowindex) => {
-  //   const newRow = [];
-  //   row.forEach((cell, cellindex) => {
-  //     const width =  imageAreaWidth * (cell.w / 100);
-  //     const height = imageAreaHeight * (cell.h / 100);
-  //     newRow.push({
-  //         content: '',
-  //         styles: { cellWidth: width, minCellHeight: height, colSpan: colSpan[rowindex]  }
-  //     })
-  //   })
-  //   body.push(newRow)
-  // });
-
-
   const columnStyles = {};
   const body = [];
   gridSettings.columns.forEach(col => {
@@ -74,7 +59,7 @@ function addIllustrationGrid(doc, data, gridSettings) {
     gridSettings.columns.forEach(col => {
       const cell = gridSettings.cells[cellCount];
       if(cell) {
-        const cellContent = { column: col.dataKey, content: '', colSpan: cell.span, rowSpan: 1, styles: { minCellHeight: imageAreaHeight * (row.height / 100)  } };
+        const cellContent = { column: col.dataKey, content: `[${cell.id}]`, colSpan: cell.span, rowSpan: 1, styles: { minCellHeight: imageAreaHeight * (row.height / 100)  } };
         rowData.push(cellContent);
         cellCount++;
   
@@ -89,12 +74,23 @@ function addIllustrationGrid(doc, data, gridSettings) {
     margin: { left: data.cell.x },
     columns: gridSettings.columns.map(i => {return {dataKey: i.dataKey}}),
     columnStyles: columnStyles,
-
     body: body,
-    
+    didParseCell: async (data) => {
+      if (data.section === 'body') {
+        const content = data.cell.raw.content.replace('[', '').replace(']', '');
+        if(content) {
+          const cellData = gridSettings.cells.find(c => c.id === content);
+          if(cellData) {
+            console.log(cellData)
+            data.cell.base64 = cellData.img.base64;
+          }
+        }
+      }
+
+    },
     didDrawCell: async (data) => {
-      if (data.section === 'body' && data.row.index === 0 && data.column.index === 0) {
-        // doc.addImage(imgsrc.base64, 'JPEG', data.cell.x , data.cell.y + 10, 0, 90);      
+      if (data.section === 'body' && data.cell.base64) {
+        doc.addImage(data.cell.base64, 'JPEG', data.cell.x +2, data.cell.y+2, 0, data.cell.height-4);      
       }
       if(data.section === 'body' && data.row.index >= 1){
         cellBorderTop(doc, data, 200)
@@ -137,42 +133,19 @@ examples.techPack = function () {
         { name: 'row3', height: 33}
       ],
       cells: [
-        {img:imgsrc, span: 1},
-        {img:imgsrc, span: 2},
-        {img:imgsrc, span: 1},
-        {img:imgsrc, span: 1},
-        {img:imgsrc, span: 1},
-        {img:imgsrc, span: 1},
-        {img:imgsrc, span: 1},
-        {img:imgsrc, span: 1},
+        {img:imgsrc, span: 1, id: 'cell1'},
+        {img:imgsrc, span: 2, id: 'cell2'},
+        {img:imgsrc, span: 0, id: 'cell2'},
+        {img:imgsrc, span: 1, id: 'cell3'},
+        {img:imgsrc, span: 1, id: 'cell4'},
+        {img:imgsrc, span: 1, id: 'cell5'},
+        {img:imgsrc, span: 1, id: 'cell6'},
+        {img:imgsrc, span: 1, id: 'cell7'},
+        {img:imgsrc, span: 1, id: 'cell8'},
       ]
     });
 
-
-  // makeIllustrationPage(doc, 
-  //   {
-  //     text:'1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
-  //     grid: [
-  //       [{w:100,h:70, img:imgsrc}], 
-  //       [{w:100,h:30, img:imgsrc}]
-  //     ],
-  //     colSpan: [1, 1]
-
-  //   });
-
-  //   makeIllustrationPage(doc, 
-  //     {
-  //       text:'1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
-  //       grid: [
-  //         [{w:10, h:50, img:imgsrc},{w:90, h:50, img:imgsrc}], 
-  //         [{w:100, h:50, img:imgsrc}]
-  //       ],
-  //       colSpan: [1, 2]
-  //     });
   
-
-
-
 
   doc.setFont('dinsmallcapspdf')
   doc.putTotalPages(totalPagesExp)
