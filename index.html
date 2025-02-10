@@ -91,8 +91,11 @@
 <div class="pure-g" style="padding-top: 50px; height: 100%;">
     <div id="panel" class="pure-u-1 pure-u-md-1-5">
         <ul class="menu">
-            <li><a href="#techPack">Tech Pack</a></li>
+            <li><a href="#frontPage">Front Page</a></li>
+            <li><a href="#mainIllustration">Main Illustration</a></li>
+            <li><a href="#variantIllustration">Variant Illustrations</a></li>
             <li><a href="#BOMTable">Bill of Material</a></li>
+            <li><a href="#drawings">Drawings</a></li>
         </ul>
 
         <button id="download-btn" class="pure-button">Download PDF</button>
@@ -130,7 +133,7 @@
     async function update(shouldDownload) {
 
 
-        var funcStr = window.location.hash.replace(/#/g, '') || 'techPack';
+        var funcStr = window.location.hash.replace(/#/g, '') || 'frontPage';
         var doc = await window.examples[funcStr]();
 
         doc.setProperties({

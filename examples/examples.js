@@ -2,119 +2,108 @@ var examples = {}
 window.examples = examples
 var totalPagesExp = 'totalpagescountstringtobereplaced'
 
-
+const margin =  {
+  left: 14
+}
 const imageAreaWidth = 200; 
 const imageAreaHeight = 170;
 const cellPadding = 2;
-// const grids = [{
-//   id: 0,
-//   name: 'default',
-//   columns
 
-// }]
-
-function makeIllustrationPage(doc, settings = {}) {
-  doc.autoTable({
-    theme: 'plain',
-    body: [
-      ['', settings.text],
-    ],
-    columns: [
-      { header: ' ', dataKey: 'illustration' },
-      { header: ' ', dataKey: 'text' },
-    ],
-    columnStyles: { 
-      illustration: { cellPadding:cellPadding, cellWidth: imageAreaWidth, minCellHeight: imageAreaHeight},
-      text: {cellPadding:cellPadding } 
-
-    }, 
-    didDrawCell: async (data) => {
-      if (data.section === 'body' && data.column.dataKey === 'illustration') {
-        addIllustrationGrid(doc, data, settings)
-      }
-      if(data.section === 'body' && data.column.dataKey === 'text'){
-        cellBorderLeft(doc, data, 0)
-      }
-    },
-    willDrawPage: function (data) {
-      addPageHeader(doc, data)
-    },
-    didDrawPage: function () {
-      addPageNumber(doc)
-    },
+examples.frontPage = function () {
+  var doc = new jsPDF({
+    orientation: 'l',
+    unit: 'mm',
+    format: 'a4',
+    putOnlyUsedFonts: true,
   })
-}
-
-
-function addIllustrationGrid(doc, data, gridSettings) {
-  const columnStyles = {};
-  const body = [];
-  gridSettings.columns.forEach(col => {
-    columnStyles[col.dataKey] = { cellWidth: imageAreaWidth * (col.width / 100) };
-  });
-
-  let cellCount = 0;
-  gridSettings.rows.forEach(row => {
-    const rowData = [];
-    gridSettings.columns.forEach(col => {
-      const cell = gridSettings.cells[cellCount];
-      if(cell) {
-        const cellContent = { column: col.dataKey, content: `[${cell.id}]`, colSpan: cell.span, rowSpan: 1, styles: { minCellHeight: imageAreaHeight * (row.height / 100)  } };
-        rowData.push(cellContent);
-        cellCount++;
+  addFontPack(doc);
+  doc.setFont('DINBold')
+  doc.setFontSize(42)
+  doc.text("Tech Pack", margin.left, 40);
   
-      }
-    });
-    body.push(rowData);
-  });
+  
+  
+  doc.setFontSize(7)
+  addPageHeader(doc)
+  doc.setFont('dinsmallcapspdf')
+  doc.putTotalPages(totalPagesExp)
+  // addPageNumber(doc);
 
-  doc.autoTable({
-    theme: 'plain',
-    startY: data.cell.y,
-    margin: { left: data.cell.x },
-    columns: gridSettings.columns.map(i => {return {dataKey: i.dataKey}}),
-    columnStyles: columnStyles,
-    body: body,
-    didParseCell: async (data) => {
-      if (data.section === 'body' && data.cell.raw && data.cell.raw.content) {
-        const content = data.cell.raw.content.replace('[', '').replace(']', '');
-        if(content) {
-          const cellData = gridSettings.cells.find(c => c.id === content);
-          if(cellData) {
-            data.cell.imgObj = cellData.img;
-          }
-        }
-      }
-
-    },
-    didDrawCell: async (data) => {
-      if (data.section === 'body' && data.cell.imgObj) {
-        const obj = data.cell.imgObj;
-        const str = obj.base64;
-        const cellProp = data.cell.width / data.cell.height;
-        const imgProp = obj.width / obj.height;
-        if(imgProp <= cellProp) {
-          doc.addImage(str, 'JPEG', data.cell.x+2, data.cell.y+2, 0, data.cell.height-4);      
-        } else {
-          doc.addImage(str, 'JPEG', data.cell.x+2, data.cell.y+2, data.cell.width-4, 0);      
-        }
-      }
-      if(data.section === 'body' && data.row.index >= 1){
-        cellBorderTop(doc, data, 200)
-      }
-      if(data.section === 'body' && data.column.index === 0){
-        // cellBorderTop(doc, data, 200)
-      }
-      if(data.section === 'body' && data.column.index >= 1){
-        cellBorderLeft(doc, data, 200)
-      }
-    },
-  })
-
-
+  return doc
 }
 
-examples.techPack = async function () {
+examples.mainIllustration = async function () {
+  var doc = new jsPDF({
+    orientation: 'l',
+    unit: 'mm',
+    format: 'a4',
+    putOnlyUsedFonts: true,
+  })
+  const img = await getDataUri('examples/img/mainPackShot.png')
+  addFontPack(doc);
+  doc.setFont('DINNormal')
+  doc.setFontSize(10)
+  doc.text("Norrøna Tech Pack", margin.left, 20);
+  doc.setFontSize(21)
+  doc.text("1001-20 lofoten Gore-tex Pro Plus Jacket M's", margin.left, 35);
+  doc.addImage(img.base64, 'JPEG', margin.left, 40, 270, 0);      
+
+  
+  
+  doc.setFontSize(7)
+  addPageHeader(doc)
+  doc.setFont('dinsmallcapspdf')
+  doc.putTotalPages(totalPagesExp)
+  // addPageNumber(doc);
+
+  return doc
+}
+
+
+examples.variantIllustration = async function () {
+  var doc = new jsPDF({
+    orientation: 'l',
+    unit: 'mm',
+    format: 'a4',
+    putOnlyUsedFonts: true,
+  })
+  const img = await getDataUri('examples/img/colorPackShot.png')
+  addFontPack(doc);
+  doc.setFont('DINNormal')
+  doc.setFontSize(10)
+  doc.text("Style and Color Overview", margin.left, 20);
+  doc.setFontSize(10)
+
+  const startX = margin.left;
+  const startY = 40;
+  const width = imageAreaWidth / 3;
+  const height  = 80;
+  const padding = 30
+  let row = 0;
+  let col = 0;
+  for(let i = 0; i < 5; i++) {
+    const xpos = startX + (col*(width + padding))
+    const ypos = startY + (row*height);
+    doc.addImage(img.base64, 'JPEG', xpos, ypos, width, 0);      
+    doc.text("1001-21\nOlveNight\nS-XL\nCarry over color",xpos, ypos + 40);
+    if((i+1) % 3 === 0) {
+      row++;
+      col = 0;
+    } else {
+      col++;
+    }
+  }
+  doc.setFontSize(7)
+  addPageHeader(doc)
+  doc.setFont('dinsmallcapspdf')
+  doc.putTotalPages(totalPagesExp)
+  // addPageNumber(doc);
+
+  return doc
+}
+
+
+examples.drawings = async function () {
 
   var doc = new jsPDF({
     orientation: 'l',
@@ -136,15 +125,14 @@ examples.techPack = async function () {
   const img11 = await getDataUri('examples/img/Asset 11.png')
 
   addFontPack(doc);
+
   doc.setFontSize(7)
-
-
   makeIllustrationPage(doc, 
     {
       text:'1. Brim mesh\n2. brim wire\n3. 3 edgle tape 20 mm\nHow to:',
       columns: [{ dataKey: 'col1', width: 100 }],
       rows: [{ name: 'row1', height: 100}],
-      cells: [{img:img0, span: 1, id: 'cell1'}]
+      cells: [{img:img0, span: 1, id: 'cell1', title: 'Illustration title 1'}]
     });
 
 
@@ -157,8 +145,8 @@ examples.techPack = async function () {
           { name: 'row2', height: 40}
         ],
         cells: [
-          {img:img1, span: 1, id: 'cell1'},
-          {img:img2, span: 1, id: 'cell2'}
+          {img:img1, span: 1, id: 'cell1', title: 'Illustration title 1'},
+          {img:img2, span: 1, id: 'cell2', title: 'Illustration title 2'}
         ]
       });
 
@@ -174,9 +162,9 @@ examples.techPack = async function () {
           { name: 'row2', height: 40}
         ],
         cells: [
-          {img:img3, span: 1, id: 'cell1'},
-          {img:img4, span: 1, id: 'cell2'},
-          {img:img5, span: 2, id: 'cell3'},
+          {img:img3, span: 1, id: 'cell1', title: 'Illustration title 1'},
+          {img:img4, span: 1, id: 'cell2', title: 'Illustration title 2'},
+          {img:img5, span: 2, id: 'cell3', title: 'Illustration title 3'},
           {span: 0, id: 'cell4'}
         ]
       });
@@ -193,10 +181,10 @@ examples.techPack = async function () {
             { name: 'row2', height: 40}
           ],
           cells: [
-            {img:img6, span: 1, id: 'cell1'},
-            {img:img7, span: 1, id: 'cell2'},
-            {img:img8, span: 1, id: 'cell3'},
-            {img:img9, span: 1, id: 'cell4'},
+            {img:img6, span: 1, id: 'cell1', title: 'Illustration title 1'},
+            {img:img7, span: 1, id: 'cell2', title: 'Illustration title 2'},
+            {img:img8, span: 1, id: 'cell3', title: 'Illustration title 3'},
+            {img:img9, span: 1, id: 'cell4', title: 'Illustration title 4'},
           ]
         });
   
@@ -212,8 +200,8 @@ examples.techPack = async function () {
               { name: 'row1', height: 100},
             ],
             cells: [
-              {img:img10, span: 1, id: 'cell1'},
-              {img:img11, span: 1, id: 'cell2'},
+              {img:img10, span: 1, id: 'cell1', title: 'Illustration title 1'},
+              {img:img11, span: 1, id: 'cell2', title: 'Illustration title 2'},
             ]
           });
 
@@ -299,7 +287,7 @@ examples.BOMTable = function () {
     willDrawPage: function (data) {
       numberOfTableBreaks +=1;
       // Header
-      addPageHeader(doc, data)
+      addPageHeader(doc)
     },
     didDrawPage: function () {
       addPageNumber(doc)
@@ -338,23 +326,23 @@ function addPageNumber(doc) {
   doc.text(str, 320, 9, { align: 'right' })
 }
 
-function addPageHeader(doc, data) {
+function addPageHeader(doc) {
   doc.setFont('dinsmallcapspdf')
   doc.setTextColor(40)
   if (LOGO_SMALL) {
-    doc.addImage(LOGO_SMALL, 'JPEG', data.settings.margin.left, 5, 18, 5)
+    doc.addImage(LOGO_SMALL, 'JPEG', margin.left, 5, 18, 5)
   }
 
-  doc.text('SS2425', data.settings.margin.left + 23, 9)
-  doc.text('100120', data.settings.margin.left + 53, 9)
+  doc.text('SS2425', margin.left + 23, 9)
+  doc.text('100120',margin.left + 53, 9)
   doc.text(
     'lofoten Goretex pro plus Jacket Ms',
-    data.settings.margin.left + 78,
+    margin.left + 78,
     9,
   )
-  doc.text('031220', data.settings.margin.left + 200, 9)
+  doc.text('031220', margin.left + 200, 9)
   doc.setDrawColor(40)
-  doc.line(data.settings.margin.left, 13, 281, 13)
+  doc.line(margin.left, 13, 281, 13)
 }
 
 
@@ -432,8 +420,8 @@ function bodyRows(rowCount = 10) {
       grading: 'no',
     })
   }
-  body.splice(3, 0, {image: { content: 'Fabrics', colSpan: 14, styles:{fillColor: 170 }}});
-  body.splice(15, 0, {image: { content: 'Zippers', colSpan: 14, styles:{fillColor: 170 } }});
+  body.splice(3, 0, {image: { content: 'Fabrics', colSpan: 14, styles:{fillColor: 200 }}});
+  body.splice(15, 0, {image: { content: 'Zippers', colSpan: 14, styles:{fillColor: 200 } }});
   return body
 }
 
@@ -503,4 +491,110 @@ function cellBorderTop(doc,data, color=200) {
     data.cell.x + data.cell.width,
     data.cell.y,
   )
+}
+
+
+
+
+function makeIllustrationPage(doc, settings = {}) {
+  doc.autoTable({
+    theme: 'plain',
+    body: [
+      ['', settings.text],
+    ],
+    columns: [
+      { header: ' ', dataKey: 'illustration' },
+      { header: ' ', dataKey: 'text' },
+    ],
+    columnStyles: { 
+      illustration: { cellPadding:cellPadding, cellWidth: imageAreaWidth, minCellHeight: imageAreaHeight},
+      text: {cellPadding:cellPadding } 
+
+    }, 
+    didDrawCell: async (data) => {
+      if (data.section === 'body' && data.column.dataKey === 'illustration') {
+        addIllustrationGrid(doc, data, settings)
+      }
+      if(data.section === 'body' && data.column.dataKey === 'text'){
+        cellBorderLeft(doc, data, 0)
+      }
+    },
+    willDrawPage: function (data) {
+      addPageHeader(doc)
+    },
+    didDrawPage: function () {
+      addPageNumber(doc)
+    },
+  })
+}
+
+
+function addIllustrationGrid(doc, data, gridSettings) {
+  const columnStyles = {};
+  const body = [];
+  gridSettings.columns.forEach(col => {
+    columnStyles[col.dataKey] = { cellWidth: imageAreaWidth * (col.width / 100) };
+  });
+
+  let cellCount = 0;
+  gridSettings.rows.forEach(row => {
+    const rowData = [];
+    gridSettings.columns.forEach(col => {
+      const cell = gridSettings.cells[cellCount];
+      if(cell) {
+        const cellContent = { column: col.dataKey, content: `${cell.title} [${cell.id}]`, colSpan: cell.span, rowSpan: 1, styles: { minCellHeight: imageAreaHeight * (row.height / 100)  } };
+        rowData.push(cellContent);
+        cellCount++;
+  
+      }
+    });
+    body.push(rowData);
+  });
+
+  doc.autoTable({
+    theme: 'plain',
+    startY: data.cell.y,
+    margin: { left: data.cell.x },
+    columns: gridSettings.columns.map(i => {return {dataKey: i.dataKey}}),
+    columnStyles: columnStyles,
+    body: body,
+    didParseCell: async (data) => {
+      if (data.section === 'body' && data.cell.raw && data.cell.raw.content) {
+        const match = data.cell.raw.content.match(/(?<=\[)[^\][]*(?=])/g);
+        const imageId = match[0];
+        data.cell.text[0] = data.cell.text[0].replace(`[${imageId}]`, '');
+        if(imageId) {
+          const cellData = gridSettings.cells.find(c => c.id === imageId);
+          if(cellData) {
+            data.cell.imgObj = cellData.img;
+          }
+        }
+      }
+
+    },
+    didDrawCell: async (data) => {
+      if (data.section === 'body' && data.cell.imgObj) {
+        const obj = data.cell.imgObj;
+        const str = obj.base64;
+        const cellProp = (data.cell.width-4) / (data.cell.height - 10);
+        const imgProp = obj.width / obj.height;
+        if(imgProp <= cellProp) {
+          doc.addImage(str, 'JPEG', data.cell.x+2, data.cell.y+8, 0, data.cell.height-10);      
+        } else {
+          doc.addImage(str, 'JPEG', data.cell.x+2, data.cell.y+2, data.cell.width-4, 0);      
+        }
+      }
+      if(data.section === 'body' && data.row.index >= 1){
+        cellBorderTop(doc, data, 200)
+      }
+      if(data.section === 'body' && data.column.index === 0){
+        // cellBorderTop(doc, data, 200)
+      }
+      if(data.section === 'body' && data.column.index >= 1){
+        cellBorderLeft(doc, data, 200)
+      }
+    },
+  })
+
+
 }
