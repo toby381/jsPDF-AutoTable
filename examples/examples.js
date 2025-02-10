@@ -103,6 +103,38 @@ examples.variantIllustration = async function () {
 }
 
 
+examples.tableOfContent = async function () {
+  var doc = new jsPDF({
+    orientation: 'l',
+    unit: 'mm',
+    format: 'a4',
+    putOnlyUsedFonts: true,
+  })
+  addFontPack(doc);
+  doc.setFont('DINNormal')
+  doc.setFontSize(10)
+  doc.text("Page", 150, 30);
+  doc.text("Main Sections", 170, 30);
+  for(let i = 0; i < 30; i++) {
+    doc.text(`${i+1}`, 150, 40 + (i*5));
+    doc.text('1.', 170, 40 + (i*5));
+    doc.text('Product design drawing', 180, 40 + (i*5));
+
+  }
+  
+  
+  
+  doc.setFontSize(7)
+  addPageHeader(doc)
+  doc.setFont('dinsmallcapspdf')
+  doc.putTotalPages(totalPagesExp)
+  // addPageNumber(doc);
+
+  return doc
+}
+
+
+
 examples.drawings = async function () {
 
   var doc = new jsPDF({
@@ -291,6 +323,67 @@ examples.BOMTable = function () {
     },
     didDrawPage: function () {
       addPageNumber(doc)
+    },
+  })
+
+  // table count output
+  doc.setFont('DINBold')
+  const replaceExpression = new RegExp(doc.pdfEscape16('{BOMTablePageCount}', doc.internal.getFont()), "g");
+  for (var n = 1; n <= doc.internal.getNumberOfPages(); n++) {
+    for (var i = 0; i < doc.internal.pages[n].length; i++) {
+      doc.internal.pages[n][i] = doc.internal.pages[n][i].replace(replaceExpression, doc.pdfEscape16(`${n} / ${numberOfTableBreaks}`, doc.internal.getFont()));
+    }
+  }
+  
+  doc.setFont('dinsmallcapspdf')
+  doc.putTotalPages(totalPagesExp)
+
+  return doc
+}
+
+examples.colorMatrix = function () {
+  var doc = new jsPDF({
+    orientation: 'l',
+    unit: 'mm',
+    format: 'a4',
+    putOnlyUsedFonts: true,
+  })
+  addFontPack(doc);
+  doc.setFontSize(7)
+
+
+  let numberOfTableBreaks = 0;
+  doc.autoTable({
+    theme: 'plain',
+    margin: { top: 15 },
+    rowPageBreak: 'avoid',
+    columns: [
+      { dataKey: 'col1' },
+      { dataKey: 'col2' },
+      { dataKey: 'col3' },
+      { dataKey: 'col4' },
+      
+    ],
+    styles: {
+      lineWidth: 0,
+      fontSize: 7
+    },
+    headStyles: {
+      font: 'DINNormal',
+    },
+    bodyStyles: {
+      font: 'DINNormal',
+    },
+    columnStyles: {},
+    head: [],
+    body: [],
+    didParseCell: (data) => {
+    },
+    didDrawCell: (data) => {
+    },
+    willDrawPage: function (data) {
+    },
+    didDrawPage: function () {
     },
   })
 
