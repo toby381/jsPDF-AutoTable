@@ -27,9 +27,7 @@ Open `http://localhost:9000`. The sidebar lets you preview each section individu
 ├── package.json
 ├── vendor/                     ← Vendored third-party libs (do not modify)
 │   ├── jspdf.umd.js
-│   ├── jspdf.plugin.autotable.js
-│   ├── pure-min.css
-│   └── grids-responsive-min.css
+│   └── jspdf.plugin.autotable.js
 └── lib/                        ← All custom application code
     ├── techpack.js             ← Public API — generateAll() / generateSection()
     ├── imageLoader.js          ← Pre-loads all images before rendering
@@ -138,7 +136,7 @@ Key points:
 
 ## Adding a new section
 
-Follow these five steps:
+Follow these six steps:
 
 **1. Create the section file** — `lib/sections/mySection.js`
 
@@ -235,7 +233,7 @@ document.getElementById('output').data = doc.output('datauristring')
 |---|---|
 | Variant images | All color variants currently share one `imagePath`. In PLM, each variant should have its own image URL. The data shape already supports this — `variantIllustration.js` needs updating to iterate per-variant image. |
 | Color Matrix | Fully data-driven and renders correctly. The sample data has 7 rows. PLM API should return real color/size combinations. |
-| Image load errors | If an `imagePath` URL fails to load, `preloadImages()` will throw and PDF generation will not start. Add a `.catch()` around the `generateAll`/`generateSection` calls in production. |
+| Image load errors | If an `imagePath` URL fails to load, `preloadImages()` will throw and PDF generation will not start. The viewer already handles this with a visible error banner — ensure the same error handling is in place wherever this module is used in PLM. |
 | `cellBorderRight()` | Defined in `helpers/borders.js` but not currently used by any section. Available if needed. |
 | Page header values | `season`, `sku`, `productName`, `date` are hardcoded in `sampleData.js`. In PLM these should come from the product record in the API response. |
 | Font licensing | The DIN font family embedded in `lib/assets/fonts/pdfFont.js` must be licensed for use in generated PDFs. Confirm with the brand/legal team before production use. |
@@ -248,6 +246,5 @@ document.getElementById('output').data = doc.output('datauristring')
 |---|---|---|
 | jsPDF | 2.5.x | PDF document generation |
 | jsPDF-AutoTable | 3.8.x | Table rendering plugin for jsPDF |
-| Pure CSS | — | Minimal CSS for the viewer UI layout |
 
-All three are vendored in `vendor/` — no `npm install` required to run the viewer.
+Both are vendored in `vendor/` — no `npm install` required to run the viewer.

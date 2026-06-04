@@ -5,9 +5,5 @@
   "private": true,
   "scripts": {
     "start": "npx serve . --listen 9000"
-  },
-  "dependencies": {
-    "jspdf": "^2.5.1",
-    "jspdf-autotable": "^3.8.4"
   }
 }

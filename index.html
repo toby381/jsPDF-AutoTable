@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="vendor/pure-min.css">
-    <link rel="stylesheet" href="vendor/grids-responsive-min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PLM Techpack</title>
     <style>
         * { box-sizing: border-box; }
@@ -201,6 +199,21 @@
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Error message ───────────────────────────────────────────────── */
+        #error-banner {
+            display: none;
+            position: absolute;
+            top: 80px; left: 200px; right: 0;
+            background: #fdf2f2;
+            border-bottom: 1px solid #f5c6c6;
+            color: #8b2020;
+            font-size: 13px;
+            padding: 10px 16px;
+            z-index: 6;
+        }
+
+        #error-banner.visible { display: block; }
     </style>
 </head>
 <body>
@@ -218,10 +231,13 @@
     <span class="navbar-title">Techpack</span>
 </header>
 
-<!-- Olive sub-bar -->
+<!-- Sage/olive sub-bar -->
 <div class="subbar">
     <span class="subbar-label" id="subbar-label">Front Page</span>
 </div>
+
+<!-- Error banner — shown when preview or download fails -->
+<div id="error-banner"></div>
 
 <!-- Loading overlay -->
 <div id="loading">
@@ -252,13 +268,10 @@
         </div>
     </div>
 
-    <div id="wrapper">
-        <object id="output" type="application/pdf"></object>
-    </div>
+    <div id="wrapper"></div>
 </div>
 
 <!-- jsPDF + AutoTable plugin -->
-<script>if (!window.Promise) window.Promise = { prototype: null };</script>
 <script src="vendor/jspdf.umd.js"></script>
 <script>if (!window.jsPDF) window.jsPDF = window.jspdf.jsPDF</script>
 <script src="vendor/jspdf.plugin.autotable.js"></script>
@@ -320,19 +333,58 @@
     }
 
     function showLoading(text) {
+        hideError()
+        // Replace the viewer element with an empty div so the browser's PDF
+        // plugin has nothing to show — prevents the raw base64 title flickering.
+        var wrapper = document.getElementById('wrapper')
+        wrapper.innerHTML = ''
         document.getElementById('loading-text').textContent = text || 'Loading…'
         document.getElementById('loading').classList.add('visible')
+    }
+
+    // Holds the current blob URL so we can revoke it before creating a new one,
+    // preventing memory leaks from accumulated unreleased object URLs.
+    var _currentBlobUrl = null
+
+    function showPDF(doc) {
+        // Use a Blob URL instead of a data URI — the browser PDF viewer displays
+        // a blob: URL as an empty or short title rather than the raw base64 string.
+        if (_currentBlobUrl) {
+            URL.revokeObjectURL(_currentBlobUrl)
+            _currentBlobUrl = null
+        }
+
+        var blob = doc.output('blob')
+        var blobUrl = URL.createObjectURL(blob)
+        _currentBlobUrl = blobUrl
+
+        var iframe = document.createElement('iframe')
+        iframe.style.width = '100%'
+        iframe.style.height = '100%'
+        iframe.style.border = 'none'
+        iframe.src = blobUrl
+        document.getElementById('wrapper').appendChild(iframe)
     }
 
     function hideLoading() {
         document.getElementById('loading').classList.remove('visible')
     }
 
+    function showError(message) {
+        var el = document.getElementById('error-banner')
+        el.textContent = '⚠ ' + message
+        el.classList.add('visible')
+    }
+
+    function hideError() {
+        document.getElementById('error-banner').classList.remove('visible')
+    }
+
     // Preview the active section whenever the hash changes
-    window.onhashchange = function () { previewSection() }
+    window.addEventListener('hashchange', function () { previewSection() })
 
     // Download ALL sections as a single PDF
-    document.getElementById('download-btn').onclick = async function () {
+    document.getElementById('download-btn').addEventListener('click', async function () {
         var btn = this
         btn.disabled = true
         btn.textContent = 'Generating…'
@@ -341,12 +393,15 @@
             var doc = await techpack.generateAll(techpackData)
             doc.setProperties({ title: 'Techpack', subject: 'PLM Techpack PDF' })
             doc.save('techpack.pdf')
+        } catch (e) {
+            console.error('Download failed:', e)
+            showError('Could not generate PDF: ' + e.message)
         } finally {
             btn.disabled = false
             btn.textContent = 'Download PDF'
             hideLoading()
         }
-    }
+    })
 
     // Preview a single section — or all sections — in the right panel
     async function previewSection() {
@@ -362,9 +417,10 @@
                 doc = await techpack.generateSection(section, techpackData)
                 doc.setProperties({ title: 'Preview: ' + section })
             }
-            document.getElementById('output').data = doc.output('datauristring')
+            showPDF(doc)
         } catch (e) {
             console.error('Preview failed:', e)
+            showError('Could not load preview: ' + e.message)
         } finally {
             hideLoading()
         }
