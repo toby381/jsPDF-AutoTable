@@ -301,17 +301,40 @@
     /**
      * Techpack data — single source of truth for all section content.
      *
-     * To connect to the PLM API, replace the assignment below with a fetch:
+     * To connect to the PLM API, replace the loadData() function below.
+     * The returned Promise must resolve with an object matching the shape
+     * defined in lib/data/sampleData.js.
      *
-     *   fetch('/api/techpack/' + productId)
-     *     .then(function(r) { return r.json() })
-     *     .then(function(data) { techpackData = data })
+     * Example API integration:
      *
-     * The API response must match the shape defined in lib/data/sampleData.js.
-     * Images should be provided as URL strings (imagePath fields) —
-     * imageLoader.js will resolve them to base64 before rendering.
+     *   function loadData() {
+     *     return fetch('/api/techpack/' + productId, {
+     *       headers: { 'Authorization': 'Bearer ' + token }
+     *     }).then(function (r) { return r.json() })
+     *   }
+     *
+     * Images should be URL strings in imagePath fields —
+     * imageLoader.js resolves them to base64 before rendering.
      */
-    var techpackData = TECHPACK_SAMPLE_DATA
+    function loadData() {
+      // Replace this with a real API fetch when integrating with PLM.
+      return Promise.resolve(TECHPACK_SAMPLE_DATA)
+    }
+
+    // techpackData is populated asynchronously. All rendering is deferred
+    // until the data is ready — this prevents a race condition where
+    // previewSection() runs before the API fetch has completed.
+    var techpackData = null
+
+    loadData()
+      .then(function (data) {
+        techpackData = data
+        previewSection()
+      })
+      .catch(function (e) {
+        console.error('Failed to load Techpack data:', e)
+        showError('Could not load Techpack data: ' + e.message)
+      })
 
     // Section label map for the sub-bar
     var SECTION_LABELS = {
@@ -334,10 +357,14 @@
 
     function showLoading(text) {
         hideError()
-        // Replace the viewer element with an empty div so the browser's PDF
-        // plugin has nothing to show — prevents the raw base64 title flickering.
-        var wrapper = document.getElementById('wrapper')
-        wrapper.innerHTML = ''
+        // Revoke any active blob URL before clearing the viewer to avoid memory leaks.
+        if (_currentBlobUrl) {
+            URL.revokeObjectURL(_currentBlobUrl)
+            _currentBlobUrl = null
+        }
+        // Clear the viewer so the browser PDF plugin has nothing to show
+        // while the next PDF is generating.
+        document.getElementById('wrapper').innerHTML = ''
         document.getElementById('loading-text').textContent = text || 'Loading…'
         document.getElementById('loading').classList.add('visible')
     }
@@ -380,11 +407,18 @@
         document.getElementById('error-banner').classList.remove('visible')
     }
 
-    // Preview the active section whenever the hash changes
-    window.addEventListener('hashchange', function () { previewSection() })
+    // Preview the active section whenever the hash changes.
+    // Guard: ignore hash changes that fire before data has loaded.
+    window.addEventListener('hashchange', function () {
+        if (techpackData) previewSection()
+    })
 
     // Download ALL sections as a single PDF
     document.getElementById('download-btn').addEventListener('click', async function () {
+        if (!techpackData) {
+            showError('Data is still loading — please wait.')
+            return
+        }
         var btn = this
         btn.disabled = true
         btn.textContent = 'Generating…'
@@ -405,6 +439,7 @@
 
     // Preview a single section — or all sections — in the right panel
     async function previewSection() {
+        if (!techpackData) return  // called before data has loaded
         var section = window.location.hash.replace('#', '') || 'frontPage'
         setActiveLink(section)
         showLoading('Loading preview…')
@@ -426,8 +461,8 @@
         }
     }
 
-    // Show front page on initial load
-    previewSection()
+    // Initial render is triggered by loadData().then(...) above,
+    // once data is available. No direct call needed here.
 </script>
 
 </body>
