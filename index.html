@@ -5,60 +5,234 @@
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="vendor/pure-min.css">
     <link rel="stylesheet" href="vendor/grids-responsive-min.css">
-    <title>PLM Techpack prototype</title>
+    <title>PLM Techpack</title>
     <style>
         * { box-sizing: border-box; }
 
-        html, body { height: 100%; overflow: hidden; }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #2c2c2c;
+            background: #fff;
+        }
 
+        /* ── Top navbar ─────────────────────────────────────────────────── */
         .navbar {
             position: absolute;
             top: 0; left: 0; right: 0;
-            background: #e74c3c;
-            border-bottom: 5px solid #c0392b;
-            height: 50px;
-            white-space: nowrap;
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0 10px;
+            height: 44px;
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 8px;
+            z-index: 10;
         }
 
-        .navbar h1 { font-size: 20px; color: #fff; }
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c2c2c;
+            letter-spacing: 0.02em;
+            margin-right: 8px;
+        }
 
-        .menu { padding: 0; list-style: none; }
+        /* Leaf/tag icon — matches PLM screenshot */
+        .navbar-logo svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.75;
+        }
 
-        .menu li { vertical-align: top; }
+        .navbar-title {
+            font-size: 13px;
+            font-weight: 400;
+            color: #555;
+        }
+
+        /* ── Sage/olive sub-bar ──────────────────────────────────────────── */
+        .subbar {
+            position: absolute;
+            top: 44px; left: 0; right: 0;
+            height: 36px;
+            background: #c8cfa0;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        .subbar-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #3a3d2e;
+            letter-spacing: 0.03em;
+        }
+
+        /* ── Layout ──────────────────────────────────────────────────────── */
+        .layout {
+            position: absolute;
+            top: 80px; /* navbar + subbar */
+            left: 0; right: 0; bottom: 0;
+            display: flex;
+        }
+
+        /* ── Sidebar ─────────────────────────────────────────────────────── */
+        #panel {
+            width: 200px;
+            flex-shrink: 0;
+            background: #fff;
+            border-right: 1px solid #e5e5e5;
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0;
+            overflow-y: auto;
+        }
+
+        .panel-section-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #999;
+            padding: 8px 16px 4px;
+        }
+
+        .menu {
+            padding: 0;
+            list-style: none;
+            margin: 0;
+        }
 
         .menu li a {
+            display: block;
             text-decoration: none;
-            color: #fff;
-            font-weight: bold;
-            font-family: sans-serif;
-            padding: 10px 0;
-            line-height: 25px;
+            color: #3a3d2e;
+            font-size: 13px;
+            font-weight: 400;
+            padding: 7px 16px;
+            border-left: 3px solid transparent;
+            transition: background 0.12s, border-color 0.12s;
         }
 
-        .menu li a:hover { font-style: italic; }
+        .menu li a:hover {
+            background: #f4f5ee;
+            border-left-color: #c8cfa0;
+            color: #2c2c2c;
+        }
 
-        #panel {
-            background: #141f2b;
-            padding: 10px;
+        .menu li a.active {
+            background: #eef0e4;
+            border-left-color: #8a9060;
+            color: #2c2c2c;
+            font-weight: 500;
+        }
+
+        /* ── Download button ─────────────────────────────────────────────── */
+        .panel-footer {
+            padding: 12px 14px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        #download-btn {
+            width: 100%;
+            padding: 8px 0;
+            background: #c8cfa0;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #3a3d2e;
+            cursor: pointer;
+            transition: background 0.15s;
+            letter-spacing: 0.01em;
+        }
+
+        #download-btn:hover:not(:disabled) {
+            background: #b8bf8c;
+        }
+
+        #download-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* ── PDF viewer ──────────────────────────────────────────────────── */
+        #wrapper {
+            flex: 1;
+            overflow: hidden;
+            background: #efefef;
+        }
+
+        #output {
+            width: 100%;
             height: 100%;
         }
 
-        #wrapper { overflow: hidden; height: 100%; background: rgba(193, 193, 193, 1); }
+        /* ── Loading overlay ─────────────────────────────────────────────── */
+        #loading {
+            display: none;
+            position: absolute;
+            top: 80px; left: 200px; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.75);
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #666;
+            z-index: 5;
+        }
 
-        #output { width: 100%; height: 100%; background: rgba(193, 193, 193, 1); }
+        #loading.visible {
+            display: flex;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #c8cfa0;
+            border-top-color: #8a9060;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
+<!-- Top navbar -->
 <header class="navbar">
-    <h1>PLM Techpack prototype</h1>
+    <span class="navbar-logo">
+        <!-- Tag/label icon matching PLM -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+            <line x1="7" y1="7" x2="7.01" y2="7"/>
+        </svg>
+        PM
+    </span>
+    <span class="navbar-title">Techpack</span>
 </header>
 
-<div class="pure-g" style="padding-top: 50px; height: 100%;">
-    <div id="panel" class="pure-u-1 pure-u-md-1-5">
+<!-- Olive sub-bar -->
+<div class="subbar">
+    <span class="subbar-label" id="subbar-label">Front Page</span>
+</div>
+
+<!-- Loading overlay -->
+<div id="loading">
+    <div class="spinner"></div>
+    <span id="loading-text">Loading preview…</span>
+</div>
+
+<!-- Main layout -->
+<div class="layout">
+    <div id="panel">
+        <div class="panel-section-label">Sections</div>
         <ul class="menu">
             <li><a href="#frontPage">Front Page</a></li>
             <li><a href="#mainIllustration">Main Illustration</a></li>
@@ -68,10 +242,17 @@
             <li><a href="#colorMatrix">Color Matrix</a></li>
             <li><a href="#drawings">Drawings</a></li>
         </ul>
-        <button id="download-btn" class="pure-button">Download PDF</button>
+        <div class="panel-section-label" style="margin-top: 8px;">Document</div>
+        <ul class="menu">
+            <li><a href="#_all">Full Preview</a></li>
+        </ul>
+
+        <div class="panel-footer">
+            <button id="download-btn">Download PDF</button>
+        </div>
     </div>
 
-    <div id="wrapper" class="pure-u-1 pure-u-md-4-5">
+    <div id="wrapper">
         <object id="output" type="application/pdf"></object>
     </div>
 </div>
@@ -99,15 +280,53 @@
 <script src="lib/sections/colorMatrix.js"></script>
 <script src="lib/sections/drawings.js"></script>
 
+<script src="lib/data/sampleData.js"></script>
+<script src="lib/imageLoader.js"></script>
 <script src="lib/techpack.js"></script>
 
 <script>
     /**
-     * Data passed to the Techpack module.
-     * In PLM: replace this with the response from your API.
-     * Each key maps to a section name and its shape is documented in lib/techpack.js.
+     * Techpack data — single source of truth for all section content.
+     *
+     * To connect to the PLM API, replace the assignment below with a fetch:
+     *
+     *   fetch('/api/techpack/' + productId)
+     *     .then(function(r) { return r.json() })
+     *     .then(function(data) { techpackData = data })
+     *
+     * The API response must match the shape defined in lib/data/sampleData.js.
+     * Images should be provided as URL strings (imagePath fields) —
+     * imageLoader.js will resolve them to base64 before rendering.
      */
-    var techpackData = {}
+    var techpackData = TECHPACK_SAMPLE_DATA
+
+    // Section label map for the sub-bar
+    var SECTION_LABELS = {
+        frontPage:           'Front Page',
+        mainIllustration:    'Main Illustration',
+        variantIllustration: 'Variant Illustrations',
+        tableOfContent:      'Table of Content',
+        BOMTable:            'Bill of Material',
+        colorMatrix:         'Color Matrix',
+        drawings:            'Drawings',
+        _all:                'Full Preview',
+    }
+
+    function setActiveLink(section) {
+        document.querySelectorAll('.menu a').forEach(function (a) {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + section)
+        })
+        document.getElementById('subbar-label').textContent = SECTION_LABELS[section] || section
+    }
+
+    function showLoading(text) {
+        document.getElementById('loading-text').textContent = text || 'Loading…'
+        document.getElementById('loading').classList.add('visible')
+    }
+
+    function hideLoading() {
+        document.getElementById('loading').classList.remove('visible')
+    }
 
     // Preview the active section whenever the hash changes
     window.onhashchange = function () { previewSection() }
@@ -116,7 +335,8 @@
     document.getElementById('download-btn').onclick = async function () {
         var btn = this
         btn.disabled = true
-        btn.textContent = 'Generating...'
+        btn.textContent = 'Generating…'
+        showLoading('Generating full PDF…')
         try {
             var doc = await techpack.generateAll(techpackData)
             doc.setProperties({ title: 'Techpack', subject: 'PLM Techpack PDF' })
@@ -124,18 +344,29 @@
         } finally {
             btn.disabled = false
             btn.textContent = 'Download PDF'
+            hideLoading()
         }
     }
 
-    // Preview a single section in the right panel
+    // Preview a single section — or all sections — in the right panel
     async function previewSection() {
         var section = window.location.hash.replace('#', '') || 'frontPage'
+        setActiveLink(section)
+        showLoading('Loading preview…')
         try {
-            var doc = await techpack.generateSection(section, techpackData)
-            doc.setProperties({ title: 'Preview: ' + section })
+            var doc
+            if (section === '_all') {
+                doc = await techpack.generateAll(techpackData)
+                doc.setProperties({ title: 'Techpack — Full Preview' })
+            } else {
+                doc = await techpack.generateSection(section, techpackData)
+                doc.setProperties({ title: 'Preview: ' + section })
+            }
             document.getElementById('output').data = doc.output('datauristring')
         } catch (e) {
             console.error('Preview failed:', e)
+        } finally {
+            hideLoading()
         }
     }
 
