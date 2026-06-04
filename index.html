@@ -3,26 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="examples/libs/pure-min.css">
-    <link rel="stylesheet" href="examples/libs/grids-responsive-min.css">
-
+    <link rel="stylesheet" href="vendor/pure-min.css">
+    <link rel="stylesheet" href="vendor/grids-responsive-min.css">
     <title>PLM Techpack prototype</title>
-
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
+        html, body { height: 100%; overflow: hidden; }
 
         .navbar {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             background: #e74c3c;
             border-bottom: 5px solid #c0392b;
             height: 50px;
@@ -32,19 +23,11 @@
             padding: 0 10px;
         }
 
-        .navbar h1 {
-            font-size: 20px;
-            color: #fff;
-        }
+        .navbar h1 { font-size: 20px; color: #fff; }
 
-        .menu {
-            padding: 0;
-            list-style: none;
-        }
+        .menu { padding: 0; list-style: none; }
 
-        .menu li {
-            vertical-align: top;
-        }
+        .menu li { vertical-align: top; }
 
         .menu li a {
             text-decoration: none;
@@ -55,9 +38,7 @@
             line-height: 25px;
         }
 
-        .menu li a:hover {
-            font-style: italic;
-        }
+        .menu li a:hover { font-style: italic; }
 
         #panel {
             background: #141f2b;
@@ -65,29 +46,17 @@
             height: 100%;
         }
 
-        #wrapper {
-            overflow: hidden;
-            height: 100%;
-            background: rgba(193, 193, 193, 1);
-        }
+        #wrapper { overflow: hidden; height: 100%; background: rgba(193, 193, 193, 1); }
 
-        #output {
-            width: 100%;
-            height: 100%;
-            background: rgba(193, 193, 193, 1);
-        }
-
-        .table {
-            font-size: 14px;
-        }
+        #output { width: 100%; height: 100%; background: rgba(193, 193, 193, 1); }
     </style>
-
 </head>
 <body>
 
 <header class="navbar">
     <h1>PLM Techpack prototype</h1>
 </header>
+
 <div class="pure-g" style="padding-top: 50px; height: 100%;">
     <div id="panel" class="pure-u-1 pure-u-md-1-5">
         <ul class="menu">
@@ -99,59 +68,79 @@
             <li><a href="#colorMatrix">Color Matrix</a></li>
             <li><a href="#drawings">Drawings</a></li>
         </ul>
-
         <button id="download-btn" class="pure-button">Download PDF</button>
     </div>
 
     <div id="wrapper" class="pure-u-1 pure-u-md-4-5">
-        <object id="output" type="application/pdf">
-        </object>
+        <object id="output" type="application/pdf"></object>
     </div>
 </div>
 
-
-
-<script>if (!window.Promise) window.Promise = {prototype: null}; // Needed for jspdf IE support</script>
-<!-- 1.3.5 (no custom fonts), 1.4.1, 1.5.3 -->
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js"></script>-->
-<script src="examples/libs/jspdf.umd.js"></script>
+<!-- jsPDF + AutoTable plugin -->
+<script>if (!window.Promise) window.Promise = { prototype: null };</script>
+<script src="vendor/jspdf.umd.js"></script>
 <script>if (!window.jsPDF) window.jsPDF = window.jspdf.jsPDF</script>
+<script src="vendor/jspdf.plugin.autotable.js"></script>
 
-<script src="dist/jspdf.plugin.autotable.js"></script>
+<!-- Techpack module: assets → helpers → sections → entry point -->
+<script src="lib/assets/fonts/pdfFont.js"></script>
 
-<script src="examples/pdfFont.js"></script>
-<script src="examples/examples.js"></script>
+<script src="lib/helpers/images.js"></script>
+<script src="lib/helpers/fonts.js"></script>
+<script src="lib/helpers/borders.js"></script>
+<script src="lib/helpers/pageHeader.js"></script>
+<script src="lib/helpers/illustrations.js"></script>
 
-<!-- Some scripts to make the examples work nicely -->
+<script src="lib/sections/frontPage.js"></script>
+<script src="lib/sections/mainIllustration.js"></script>
+<script src="lib/sections/variantIllustration.js"></script>
+<script src="lib/sections/tableOfContent.js"></script>
+<script src="lib/sections/bomTable.js"></script>
+<script src="lib/sections/colorMatrix.js"></script>
+<script src="lib/sections/drawings.js"></script>
+
+<script src="lib/techpack.js"></script>
+
 <script>
+    /**
+     * Data passed to the Techpack module.
+     * In PLM: replace this with the response from your API.
+     * Each key maps to a section name and its shape is documented in lib/techpack.js.
+     */
+    var techpackData = {}
 
-    window.onhashchange = function () {
-        update();
-    };
+    // Preview the active section whenever the hash changes
+    window.onhashchange = function () { previewSection() }
 
-    document.getElementById('download-btn').onclick = function () {
-        update(true);
-    };
-    async function update(shouldDownload) {
-
-
-        var funcStr = window.location.hash.replace(/#/g, '') || 'frontPage';
-        var doc = await window.examples[funcStr]();
-
-        doc.setProperties({
-            title: 'Example: ' + funcStr,
-            subject: 'A jspdf-autotable example pdf (' + funcStr + ')'
-        });
-
-        if (shouldDownload) {
-            doc.save('table.pdf');
-        } else {
-            document.getElementById("output").data = doc.output('datauristring');
+    // Download ALL sections as a single PDF
+    document.getElementById('download-btn').onclick = async function () {
+        var btn = this
+        btn.disabled = true
+        btn.textContent = 'Generating...'
+        try {
+            var doc = await techpack.generateAll(techpackData)
+            doc.setProperties({ title: 'Techpack', subject: 'PLM Techpack PDF' })
+            doc.save('techpack.pdf')
+        } finally {
+            btn.disabled = false
+            btn.textContent = 'Download PDF'
         }
     }
 
+    // Preview a single section in the right panel
+    async function previewSection() {
+        var section = window.location.hash.replace('#', '') || 'frontPage'
+        try {
+            var doc = await techpack.generateSection(section, techpackData)
+            doc.setProperties({ title: 'Preview: ' + section })
+            document.getElementById('output').data = doc.output('datauristring')
+        } catch (e) {
+            console.error('Preview failed:', e)
+        }
+    }
 
-    update();
+    // Show front page on initial load
+    previewSection()
 </script>
 
 </body>
